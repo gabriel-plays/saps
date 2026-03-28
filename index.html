@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>SafeZone Intelligence — Property Crime Risk Reports, South Africa</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --ink:#111827;--muted:#6B7280;--border:#E5E7EB;--bg:#F9FAFB;
+  --danger:#DC2626;--warn:#D97706;--ok:#059669;
+}
+html{font-family:'Inter',sans-serif;font-size:15px;color:var(--ink);background:#fff;scroll-behavior:smooth}
+nav{display:flex;align-items:center;padding:0 2rem;height:60px;border-bottom:1px solid var(--border);position:sticky;top:0;background:#fff;z-index:50}
+.brand{font-size:.95rem;font-weight:700;letter-spacing:-.02em}
+.brand em{color:var(--danger);font-style:normal}
+.nav-right{margin-left:auto;display:flex;align-items:center;gap:.75rem}
+.pill-nav{font-size:.72rem;font-family:'IBM Plex Mono',monospace;background:var(--bg);border:1px solid var(--border);border-radius:100px;padding:.2rem .7rem;color:var(--muted)}
+.hero{max-width:720px;margin:0 auto;padding:5rem 2rem 3.5rem;text-align:center}
+.hero h1{font-family:'Libre Baskerville',serif;font-size:2.6rem;font-weight:700;line-height:1.15;letter-spacing:-.03em;margin-bottom:1rem}
+.hero h1 em{font-style:normal;position:relative}
+.hero h1 em::after{content:'';display:block;position:absolute;bottom:-2px;left:0;right:0;height:3px;background:var(--danger);border-radius:2px}
+.hero p{font-size:1.05rem;color:var(--muted);line-height:1.65;max-width:560px;margin:0 auto 2rem}
+.hero-badges{display:flex;justify-content:center;gap:.5rem;flex-wrap:wrap;margin-bottom:2.5rem}
+.badge{font-size:.7rem;font-family:'IBM Plex Mono',monospace;background:var(--bg);border:1px solid var(--border);border-radius:100px;padding:.2rem .75rem;color:var(--muted)}
+.search-card{max-width:640px;margin:0 auto 4rem;background:#fff;border:1.5px solid var(--border);border-radius:12px;box-shadow:0 1px 3px rgba(0,0,0,.08),0 0 0 1px rgba(0,0,0,.03);padding:1.75rem}
+.search-label{font-size:.72rem;font-family:'IBM Plex Mono',monospace;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;margin-bottom:.75rem;display:block}
+.input-wrap{position:relative}
+.input-icon{position:absolute;left:.85rem;top:50%;transform:translateY(-50%);font-size:1rem;pointer-events:none;color:var(--muted)}
+#addr-input{width:100%;padding:.8rem 1rem .8rem 2.5rem;border:1.5px solid var(--border);border-radius:8px;font-family:'Inter',sans-serif;font-size:.9rem;color:var(--ink);outline:none;transition:border-color .15s;background:#fff}
+#addr-input:focus{border-color:var(--ink)}
+#addr-input::placeholder{color:var(--muted)}
+.autocomplete{position:absolute;top:100%;left:0;right:0;z-index:99;background:#fff;border:1px solid var(--border);border-top:none;border-radius:0 0 8px 8px;box-shadow:0 4px 12px rgba(0,0,0,.08);max-height:240px;overflow-y:auto;display:none}
+.autocomplete.open{display:block}
+.ac-item{padding:.6rem 1rem;font-size:.82rem;cursor:pointer;display:flex;align-items:center;gap:.6rem;border-bottom:1px solid var(--border)}
+.ac-item:last-child{border-bottom:none}
+.ac-item:hover,.ac-item.focused{background:var(--bg)}
+.ac-item .ac-name{font-weight:600;font-size:.82rem}
+.ac-item .ac-sub{font-size:.7rem;color:var(--muted)}
+.ac-item .ac-risk{margin-left:auto;font-size:.65rem;font-family:'IBM Plex Mono',monospace;padding:.15rem .45rem;border-radius:3px;font-weight:700;text-transform:uppercase}
+.ac-item .ac-risk.critical{background:#7F1D1D;color:#fff}
+.ac-item .ac-risk.high{background:var(--danger);color:#fff}
+.ac-item .ac-risk.elevated{background:var(--warn);color:#fff}
+.ac-item .ac-risk.moderate{background:#92400E;color:#fff}
+.ac-item .ac-risk.low{background:var(--ok);color:#fff}
+.btn-search{width:100%;margin-top:.9rem;padding:.75rem;background:var(--ink);color:#fff;border:none;border-radius:8px;font-family:'Inter',sans-serif;font-size:.88rem;font-weight:600;cursor:pointer;transition:background .15s}
+.btn-search:hover{background:#374151}
+.btn-search:disabled{background:var(--muted);cursor:not-allowed}
+.chip-row{display:flex;flex-wrap:wrap;gap:.4rem;margin-top:1rem}
+.chip-label{font-size:.7rem;font-family:'IBM Plex Mono',monospace;color:var(--muted);width:100%;margin-bottom:.1rem}
+.chip{font-size:.73rem;border:1px solid var(--border);border-radius:100px;padding:.25rem .75rem;cursor:pointer;background:#fff;font-family:inherit;color:var(--ink);transition:border-color .15s,background .15s;white-space:nowrap}
+.chip:hover{border-color:var(--ink);background:var(--bg)}
+#loading-state{display:none;max-width:640px;margin:0 auto 4rem;text-align:center;padding:2rem}
+.loading-steps{display:flex;flex-direction:column;gap:.6rem;align-items:center}
+.step{display:flex;align-items:center;gap:.5rem;font-size:.8rem;color:var(--muted);font-family:'IBM Plex Mono',monospace}
+.step-dot{width:8px;height:8px;border-radius:50%;background:var(--border);transition:background .3s}
+.step-dot.active{background:var(--ink);animation:pulse .8s infinite}
+.step-dot.done{background:var(--ok)}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+#picker-state{display:none;max-width:640px;margin:0 auto 4rem}
+.picker-header{font-size:.82rem;font-weight:600;margin-bottom:.75rem;padding-bottom:.5rem;border-bottom:1px solid var(--border)}
+.picker-grid{display:grid;grid-template-columns:1fr 1fr;gap:.5rem}
+.picker-card{border:1px solid var(--border);border-radius:8px;padding:.75rem;cursor:pointer;transition:border-color .15s;background:#fff;text-align:left;font-family:inherit}
+.picker-card:hover{border-color:var(--ink)}
+.picker-card .pc-name{font-weight:600;font-size:.82rem}
+.picker-card .pc-prov{font-size:.7rem;color:var(--muted);margin-top:.1rem}
+.picker-card .pc-risk{display:inline-block;margin-top:.35rem;font-size:.62rem;font-family:'IBM Plex Mono',monospace;padding:.15rem .45rem;border-radius:3px;font-weight:700;text-transform:uppercase}
+.picker-card .pc-risk.critical{background:#7F1D1D;color:#fff}
+.picker-card .pc-risk.high{background:var(--danger);color:#fff}
+.picker-card .pc-risk.elevated{background:var(--warn);color:#fff}
+.picker-card .pc-risk.moderate{background:#92400E;color:#fff}
+.picker-card .pc-risk.low{background:var(--ok);color:#fff}
+#result-state{display:none;max-width:640px;margin:0 auto 4rem;border:1.5px solid var(--border);border-radius:12px;overflow:hidden}
+.result-addr{display:flex;align-items:center;justify-content:space-between;padding:.85rem 1.25rem;border-bottom:1px solid var(--border);background:var(--bg)}
+.result-addr .addr-text{font-size:.82rem;font-weight:600}
+.result-addr .addr-precinct{font-size:.7rem;color:var(--muted);font-family:'IBM Plex Mono',monospace;margin-top:.1rem}
+.result-addr .reset-btn{font-size:.75rem;color:var(--muted);cursor:pointer;background:none;border:none;font-family:inherit;text-decoration:underline}
+.risk-row{display:flex;align-items:center;gap:1rem;padding:1.25rem;border-bottom:1px solid var(--border)}
+.risk-score-big{font-family:'Libre Baskerville',serif;font-size:3rem;font-weight:700;line-height:1;min-width:70px;text-align:center}
+.risk-score-big.critical{color:#7F1D1D}
+.risk-score-big.high{color:var(--danger)}
+.risk-score-big.elevated{color:var(--warn)}
+.risk-score-big.moderate{color:#92400E}
+.risk-score-big.low{color:var(--ok)}
+.risk-detail{flex:1}
+.risk-label-tag{display:inline-block;font-size:.7rem;font-family:'IBM Plex Mono',monospace;font-weight:700;text-transform:uppercase;letter-spacing:.06em;padding:.2rem .6rem;border-radius:4px;margin-bottom:.4rem}
+.risk-label-tag.critical{background:#7F1D1D;color:#fff}
+.risk-label-tag.high{background:var(--danger);color:#fff}
+.risk-label-tag.elevated{background:var(--warn);color:#fff}
+.risk-label-tag.moderate{background:#92400E;color:#fff}
+.risk-label-tag.low{background:var(--ok);color:#fff}
+.risk-bar-wrap{margin-bottom:.4rem}
+.risk-bar-track{height:5px;background:var(--border);border-radius:3px;overflow:hidden}
+.risk-bar-fill{height:100%;border-radius:3px;background:var(--danger);transition:width .6s .1s}
+.risk-bar-fill.warn{background:var(--warn)}
+.risk-bar-fill.ok{background:var(--ok)}
+.risk-desc{font-size:.75rem;color:var(--muted);line-height:1.5}
+.stat-row{display:grid;grid-template-columns:repeat(4,1fr);border-bottom:1px solid var(--border)}
+.stat-cell{padding:.85rem 1rem;border-right:1px solid var(--border)}
+.stat-cell:last-child{border-right:none}
+.stat-val{font-size:1.15rem;font-weight:700;font-family:'Libre Baskerville',serif;line-height:1}
+.stat-lbl{font-size:.65rem;color:var(--muted);margin-top:.2rem;line-height:1.3}
+.dl-card{padding:1.25rem;background:#fff}
+.dl-card-inner{border:1px solid var(--border);border-radius:8px;padding:1rem;display:flex;align-items:center;gap:1rem}
+.dl-thumb{width:52px;height:68px;border:1px solid var(--border);border-radius:4px;background:linear-gradient(160deg,var(--bg) 0%,#fff 100%);display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:1.4rem;flex-shrink:0}
+.dl-info{flex:1}
+.dl-title{font-weight:700;font-size:.88rem;margin-bottom:.15rem}
+.dl-pills{display:flex;gap:.35rem;flex-wrap:wrap;margin-bottom:.5rem}
+.dl-pill{font-size:.65rem;font-family:'IBM Plex Mono',monospace;background:var(--bg);border:1px solid var(--border);border-radius:100px;padding:.1rem .5rem;color:var(--muted)}
+.dl-actions{display:flex;align-items:center;gap:.6rem}
+.btn-dl{background:var(--ink);color:#fff;border:none;cursor:pointer;padding:.5rem 1.1rem;border-radius:6px;font-size:.8rem;font-weight:600;font-family:inherit;text-decoration:none;display:inline-flex;align-items:center;gap:.35rem}
+.btn-dl:hover{background:#374151}
+.btn-preview{font-size:.78rem;color:var(--muted);text-decoration:none;font-family:inherit;background:none;border:none;cursor:pointer}
+.btn-preview:hover{color:var(--ink);text-decoration:underline}
+.stats-band{border-top:1px solid var(--border);padding:3rem 2rem;display:flex;justify-content:center;gap:4rem;flex-wrap:wrap;text-align:center}
+.stat-item .s-val{font-family:'Libre Baskerville',serif;font-size:2rem;font-weight:700}
+.stat-item .s-lbl{font-size:.75rem;color:var(--muted);margin-top:.2rem}
+.browse-section{max-width:900px;margin:0 auto;padding:0 2rem 4rem}
+.browse-section h2{font-family:'Libre Baskerville',serif;font-size:1.4rem;font-weight:700;margin-bottom:.35rem}
+.browse-section .sub{font-size:.82rem;color:var(--muted);margin-bottom:1.5rem}
+.province-tabs{display:flex;gap:.35rem;flex-wrap:wrap;margin-bottom:1rem}
+.prov-tab{font-size:.75rem;border:1px solid var(--border);border-radius:100px;padding:.3rem .8rem;cursor:pointer;background:#fff;font-family:inherit;color:var(--muted);transition:all .15s}
+.prov-tab.active{background:var(--ink);color:#fff;border-color:var(--ink)}
+.precinct-browse-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:.5rem}
+.pb-card{border:1px solid var(--border);border-radius:8px;padding:.75rem;cursor:pointer;transition:border-color .15s;background:#fff;text-align:left;font-family:inherit;width:100%}
+.pb-card:hover{border-color:var(--ink)}
+.pb-card .pb-name{font-weight:600;font-size:.8rem}
+.pb-card .pb-prov{font-size:.68rem;color:var(--muted);margin:.1rem 0 .3rem}
+.pb-card .pb-score{display:inline-block;font-size:.62rem;font-family:'IBM Plex Mono',monospace;padding:.12rem .4rem;border-radius:3px;font-weight:700;text-transform:uppercase}
+.pb-card .pb-score.critical{background:#7F1D1D;color:#fff}
+.pb-card .pb-score.high{background:var(--danger);color:#fff}
+.pb-card .pb-score.elevated{background:var(--warn);color:#fff}
+.pb-card .pb-score.moderate{background:#92400E;color:#fff}
+.pb-card .pb-score.low{background:var(--ok);color:#fff}
+footer{border-top:1px solid var(--border);padding:1.25rem 2rem;font-size:.72rem;color:var(--muted);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:.5rem}
+footer strong{color:var(--ink)}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="brand">Safe<em>Zone</em> / Intelligence</div>
+  <div class="nav-right">
+    <span class="pill-nav">South Africa · All 9 Provinces</span>
+    <span class="pill-nav" id="precinct-count">Loading…</span>
+  </div>
+</nav>
+
+<section class="hero">
+  <h1>Property crime risk,<br>for any <em>South African</em> address.</h1>
+  <p>Enter any address across all 9 provinces to instantly generate a detailed 3-page SAPS precinct crime risk report — powered by public crime statistics.</p>
+  <div class="hero-badges">
+    <span class="badge">40 SAPS Precincts</span>
+    <span class="badge">All 9 Provinces</span>
+    <span class="badge">12 Crime Categories</span>
+    <span class="badge">No account required</span>
+  </div>
+</section>
+
+<div class="search-card" id="search-card">
+  <label class="search-label" for="addr-input">Search by address or area</label>
+  <div class="input-wrap">
+    <span class="input-icon">📍</span>
+    <input id="addr-input" type="text"
+      placeholder="e.g. 41 5th Ave, Belgravia, Cape Town  or  Sandton, Gauteng"
+      autocomplete="off" spellcheck="false">
+    <div class="autocomplete" id="autocomplete"></div>
+  </div>
+  <button class="btn-search" id="btn-search" disabled>Generate Risk Report</button>
+  <div class="chip-row">
+    <div class="chip-label">Quick searches —</div>
+    <button class="chip" data-q="Sandton, Gauteng">Sandton</button>
+    <button class="chip" data-q="Khayelitsha, Cape Town">Khayelitsha</button>
+    <button class="chip" data-q="Constantia, Cape Town">Constantia</button>
+    <button class="chip" data-q="Durban Central">Durban CBD</button>
+    <button class="chip" data-q="Pretoria Central">Pretoria</button>
+    <button class="chip" data-q="Soweto, Gauteng">Soweto</button>
+    <button class="chip" data-q="Polokwane, Limpopo">Polokwane</button>
+    <button class="chip" data-q="Bloemfontein, Free State">Bloemfontein</button>
+  </div>
+</div>
+
+<div id="loading-state">
+  <div class="loading-steps">
+    <div class="step"><div class="step-dot" id="dot1"></div><span>Geocoding address…</span></div>
+    <div class="step"><div class="step-dot" id="dot2"></div><span>Matching SAPS precinct…</span></div>
+    <div class="step"><div class="step-dot" id="dot3"></div><span>Loading crime statistics…</span></div>
+    <div class="step"><div class="step-dot" id="dot4"></div><span>Preparing report…</span></div>
+  </div>
+</div>
+
+<div id="picker-state">
+  <div class="picker-header" id="picker-header">Select a precinct</div>
+  <div class="picker-grid" id="picker-grid"></div>
+</div>
+
+<div id="result-state">
+  <div class="result-addr">
+    <div>
+      <div class="addr-text" id="res-addr"></div>
+      <div class="addr-precinct" id="res-precinct"></div>
+    </div>
+    <button class="reset-btn" onclick="resetSearch()">← New search</button>
+  </div>
+  <div class="risk-row">
+    <div class="risk-score-big" id="res-score"></div>
+    <div class="risk-detail">
+      <div class="risk-label-tag" id="res-label"></div>
+      <div class="risk-bar-wrap">
+        <div class="risk-bar-track">
+          <div class="risk-bar-fill" id="res-bar" style="width:0%"></div>
+        </div>
+      </div>
+      <div class="risk-desc" id="res-desc"></div>
+    </div>
+  </div>
+  <div class="stat-row">
+    <div class="stat-cell"><div class="stat-val" id="s1"></div><div class="stat-lbl">Total Incidents / year</div></div>
+    <div class="stat-cell"><div class="stat-val" id="s2"></div><div class="stat-lbl">Rate per 10 000 pop.</div></div>
+    <div class="stat-cell"><div class="stat-val" id="s3"></div><div class="stat-lbl">Police Response</div></div>
+    <div class="stat-cell"><div class="stat-val" id="s4"></div><div class="stat-lbl">Nearest Station</div></div>
+  </div>
+  <div class="dl-card">
+    <div class="dl-card-inner">
+      <div class="dl-thumb">📄</div>
+      <div class="dl-info">
+        <div class="dl-title">Full Crime Risk Report (3 pages)</div>
+        <div class="dl-pills">
+          <span class="dl-pill">A4 · PDF-ready</span>
+          <span class="dl-pill">12 crime categories</span>
+          <span class="dl-pill">Charts &amp; benchmarks</span>
+          <span class="dl-pill">SAPS station directory</span>
+        </div>
+        <div class="dl-actions">
+          <a id="res-report-btn" class="btn-dl" href="#" target="_blank">↗ Open Full Report</a>
+          <button class="btn-preview" onclick="openReport()">Print / Save as PDF</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="stats-band">
+  <div class="stat-item"><div class="s-val">40</div><div class="s-lbl">SAPS Precincts covered</div></div>
+  <div class="stat-item"><div class="s-val">9</div><div class="s-lbl">Provinces</div></div>
+  <div class="stat-item"><div class="s-val">12</div><div class="s-lbl">Crime categories tracked</div></div>
+  <div class="stat-item"><div class="s-val">Free</div><div class="s-lbl">No account or API key</div></div>
+</div>
+
+<div class="browse-section">
+  <h2>Browse by province</h2>
+  <p class="sub">Select a province to filter, or click any precinct card to instantly generate a report.</p>
+  <div class="province-tabs" id="province-tabs"></div>
+  <div class="precinct-browse-grid" id="browse-grid"></div>
+</div>
+
+<footer>
+  <span><strong>SafeZone Intelligence</strong> — SAPS public crime statistics · Informational use only</span>
+  <span>© 2026 · GitHub Pages · Static · Zero tracking</span>
+</footer>
+
+<script>
+let PRECINCTS=[];let selectedPrecinct=null;let reportUrl='';
+
+function riskClass(s){return s>=80?'critical':s>=65?'high':s>=50?'elevated':s>=35?'moderate':'low'}
+function riskLabel(s){return s>=80?'CRITICAL':s>=65?'HIGH RISK':s>=50?'ELEVATED':s>=35?'MODERATE':'LOW'}
+function fmt(n){return Number(n).toLocaleString()}
+
+async function loadPrecincts(){
+  try{
+    const r=await fetch('data/precincts.json');
+    const d=await r.json();
+    PRECINCTS=d.precincts;
+    document.getElementById('precinct-count').textContent=PRECINCTS.length+' precincts';
+    buildBrowse();
+  }catch(e){
+    document.getElementById('precinct-count').textContent='offline';
+  }
+}
+
+function matchByKeyword(q){
+  const lq=q.toLowerCase().trim();
+  return PRECINCTS.map(p=>{
+    let score=0;
+    for(const s of p.suburbs){if(lq.includes(s))score+=s.length*2;else if(s.includes(lq)&&lq.length>3)score+=lq.length}
+    if(lq.includes(p.name.toLowerCase()))score+=20;
+    if(lq.includes(p.province.toLowerCase()))score+=5;
+    return{precinct:p,score};
+  }).filter(x=>x.score>0).sort((a,b)=>b.score-a.score);
+}
+
+function searchPrecincts(q){
+  const lq=q.toLowerCase().trim();
+  if(lq.length<2)return[];
+  return PRECINCTS.filter(p=>{
+    if(p.name.toLowerCase().includes(lq))return true;
+    if(p.province.toLowerCase().includes(lq))return true;
+    if(p.id.includes(lq))return true;
+    return p.suburbs.some(s=>s.includes(lq)||lq.includes(s));
+  }).slice(0,8);
+}
+
+const addrInput=document.getElementById('addr-input');
+const acDrop=document.getElementById('autocomplete');
+let acFocus=-1;
+
+addrInput.addEventListener('input',()=>{
+  document.getElementById('btn-search').disabled=addrInput.value.trim().length<3;
+  showAc(addrInput.value);
+});
+addrInput.addEventListener('keydown',e=>{
+  const items=acDrop.querySelectorAll('.ac-item');
+  if(e.key==='ArrowDown'){e.preventDefault();acFocus=Math.min(acFocus+1,items.length-1);hiAc(items)}
+  else if(e.key==='ArrowUp'){e.preventDefault();acFocus=Math.max(acFocus-1,-1);hiAc(items)}
+  else if(e.key==='Enter'){e.preventDefault();if(acFocus>=0&&items[acFocus])items[acFocus].click();else runSearch()}
+  else if(e.key==='Escape')closeAc();
+});
+document.addEventListener('click',e=>{if(!e.target.closest('.input-wrap'))closeAc()});
+
+function hiAc(items){items.forEach((el,i)=>el.classList.toggle('focused',i===acFocus))}
+function closeAc(){acDrop.classList.remove('open');acFocus=-1}
+
+function showAc(q){
+  if(q.length<2){closeAc();return}
+  const matches=searchPrecincts(q);
+  if(!matches.length){closeAc();return}
+  acDrop.innerHTML=matches.map(p=>{
+    const rc=riskClass(p.risk_score);
+    return`<div class="ac-item" data-id="${p.id}">
+      <div><div class="ac-name">${p.name}</div><div class="ac-sub">${p.province} · ${p.suburbs.slice(0,3).join(', ')}</div></div>
+      <div class="ac-risk ${rc}">${riskLabel(p.risk_score)}</div>
+    </div>`;
+  }).join('');
+  acDrop.querySelectorAll('.ac-item').forEach(el=>{
+    el.addEventListener('click',()=>{
+      const p=PRECINCTS.find(x=>x.id===el.dataset.id);
+      if(p){addrInput.value=p.name+', '+p.province;closeAc();selectAndShow(p,addrInput.value)}
+    });
+  });
+  acDrop.classList.add('open');acFocus=-1;
+}
+
+document.getElementById('btn-search').addEventListener('click',runSearch);
+
+function runSearch(){const q=addrInput.value.trim();if(q.length<3)return;closeAc();doSearch(q)}
+
+document.querySelectorAll('.chip').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    addrInput.value=btn.dataset.q;
+    document.getElementById('btn-search').disabled=false;
+    doSearch(btn.dataset.q);
+  });
+});
+
+function doSearch(query){
+  showLoading();
+  setTimeout(()=>stepActive(1),200);
+  setTimeout(()=>{
+    stepDone(1);stepActive(2);
+    const kw=matchByKeyword(query);
+    setTimeout(()=>{
+      stepDone(2);stepActive(3);
+      setTimeout(()=>{
+        stepDone(3);stepActive(4);
+        setTimeout(()=>{
+          stepDone(4);
+          if(kw.length===0)showPicker(PRECINCTS,query,true);
+          else if(kw.length===1||kw[0].score>=( kw[1]?.score||0)*1.5)selectAndShow(kw[0].precinct,query);
+          else showPicker(kw.slice(0,6).map(x=>x.precinct),query,false);
+        },400);
+      },400);
+    },500);
+  },600);
+}
+
+function stepActive(n){document.getElementById('dot'+n).classList.add('active')}
+function stepDone(n){const d=document.getElementById('dot'+n);d.classList.remove('active');d.classList.add('done')}
+
+function showLoading(){
+  document.getElementById('search-card').style.display='none';
+  document.getElementById('result-state').style.display='none';
+  document.getElementById('picker-state').style.display='none';
+  document.getElementById('loading-state').style.display='block';
+  for(let i=1;i<=4;i++){const d=document.getElementById('dot'+i);d.className='step-dot'}
+}
+
+function showPicker(precincts,query,noMatch){
+  document.getElementById('loading-state').style.display='none';
+  const picker=document.getElementById('picker-state');picker.style.display='block';
+  document.getElementById('picker-header').innerHTML=noMatch
+    ?`No exact match for "<strong>${query}</strong>" — select the closest precinct:`
+    :`Multiple precincts matched "<strong>${query}</strong>" — select the most relevant:`;
+  const grid=document.getElementById('picker-grid');
+  grid.innerHTML=precincts.map(p=>`<button class="picker-card" data-id="${p.id}">
+    <div class="pc-name">${p.name}</div>
+    <div class="pc-prov">${p.province}</div>
+    <span class="pc-risk ${riskClass(p.risk_score)}">${riskLabel(p.risk_score)}</span>
+  </button>`).join('');
+  grid.querySelectorAll('.picker-card').forEach(btn=>{
+    btn.addEventListener('click',()=>{
+      const p=PRECINCTS.find(x=>x.id===btn.dataset.id);if(p)selectAndShow(p,query);
+    });
+  });
+}
+
+function selectAndShow(precinct,address){
+  selectedPrecinct=precinct;
+  document.getElementById('loading-state').style.display='none';
+  document.getElementById('picker-state').style.display='none';
+  document.getElementById('search-card').style.display='none';
+  const rc=riskClass(precinct.risk_score);
+  const rl=riskLabel(precinct.risk_score);
+  document.getElementById('res-addr').textContent=address;
+  document.getElementById('res-precinct').textContent='SAPS Precinct: '+precinct.name+' · '+precinct.province;
+  const scoreEl=document.getElementById('res-score');scoreEl.textContent=precinct.risk_score;scoreEl.className='risk-score-big '+rc;
+  const labelEl=document.getElementById('res-label');labelEl.textContent=rl;labelEl.className='risk-label-tag '+rc;
+  const bar=document.getElementById('res-bar');bar.style.width='0%';
+  setTimeout(()=>{bar.style.width=precinct.risk_score+'%';bar.className='risk-bar-fill '+(precinct.risk_score>=65?'':precinct.risk_score>=50?'warn':'ok')},50);
+  document.getElementById('res-desc').textContent=`${precinct.name} precinct recorded ${fmt(precinct.total_incidents)} incidents in the last 12 months at ${precinct.crime_rate_per_10k} per 10 000 population.`;
+  document.getElementById('s1').textContent=fmt(precinct.total_incidents);
+  document.getElementById('s2').textContent=precinct.crime_rate_per_10k;
+  document.getElementById('s3').textContent=precinct.response_min+' min';
+  document.getElementById('s4').textContent=precinct.stations[0]?.name||'—';
+  reportUrl=`report.html?id=${precinct.id}&address=${encodeURIComponent(address)}`;
+  document.getElementById('res-report-btn').href=reportUrl;
+  document.getElementById('result-state').style.display='block';
+  document.getElementById('result-state').scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+
+function openReport(){if(reportUrl)window.open(reportUrl,'_blank')}
+
+function resetSearch(){
+  selectedPrecinct=null;reportUrl='';addrInput.value='';
+  document.getElementById('btn-search').disabled=true;
+  document.getElementById('result-state').style.display='none';
+  document.getElementById('picker-state').style.display='none';
+  document.getElementById('loading-state').style.display='none';
+  document.getElementById('search-card').style.display='block';
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function buildBrowse(){
+  const provinces=[...new Set(PRECINCTS.map(p=>p.province))].sort();
+  const tabs=document.getElementById('province-tabs');
+  const all=document.createElement('button');all.className='prov-tab active';all.textContent='All';
+  all.onclick=()=>filterBrowse(null,all);tabs.appendChild(all);
+  provinces.forEach(prov=>{
+    const btn=document.createElement('button');btn.className='prov-tab';btn.textContent=prov;
+    btn.onclick=()=>filterBrowse(prov,btn);tabs.appendChild(btn);
+  });
+  filterBrowse(null,all);
+}
+
+function filterBrowse(province,activeBtn){
+  document.querySelectorAll('.prov-tab').forEach(b=>b.classList.remove('active'));
+  activeBtn.classList.add('active');
+  const list=province?PRECINCTS.filter(p=>p.province===province):PRECINCTS;
+  const grid=document.getElementById('browse-grid');
+  grid.innerHTML=list.map(p=>`<button class="pb-card" data-id="${p.id}">
+    <div class="pb-name">${p.name}</div>
+    <div class="pb-prov">${p.province}</div>
+    <span class="pb-score ${riskClass(p.risk_score)}">${p.risk_score} — ${riskLabel(p.risk_score)}</span>
+  </button>`).join('');
+  grid.querySelectorAll('.pb-card').forEach(btn=>{
+    btn.addEventListener('click',()=>{
+      const p=PRECINCTS.find(x=>x.id===btn.dataset.id);
+      if(p){addrInput.value=p.name+', '+p.province;document.getElementById('btn-search').disabled=false;selectAndShow(p,p.name+', '+p.province);window.scrollTo({top:0,behavior:'smooth'})}
+    });
+  });
+}
+
+loadPrecincts();
+</script>
+</body>
+</html>

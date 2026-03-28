@@ -1,0 +1,1052 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Security Intelligence Report — 41 Fifth Avenue, Belgravia, Cape Town</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500&family=Libre+Baskerville:wght@700&display=swap');
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --ink:      #111827;
+    --ink-2:    #374151;
+    --ink-3:    #6B7280;
+    --ink-4:    #9CA3AF;
+    --border:   #E5E7EB;
+    --bg:       #F9FAFB;
+    --accent:   #2563EB;
+    --acc-lt:   #EFF6FF;
+    --acc-dk:   #1D4ED8;
+    --danger:   #DC2626;
+    --dan-lt:   #FEF2F2;
+    --dan-dk:   #991B1B;
+    --warn:     #D97706;
+    --warn-lt:  #FFFBEB;
+    --warn-dk:  #92400E;
+    --ok:       #059669;
+    --ok-lt:    #ECFDF5;
+    --ok-dk:    #065F46;
+  }
+
+  html { font-size: 10pt; }
+
+  body {
+    font-family: 'Inter', sans-serif;
+    background: #E9EBF0;
+    color: var(--ink);
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  /* ── Page shell ─────────────────────────── */
+  .page {
+    width: 210mm;
+    min-height: 297mm;
+    background: #fff;
+    margin: 10mm auto;
+    position: relative;
+    overflow: hidden;
+    page-break-after: always;
+    box-shadow: 0 2px 20px rgba(0,0,0,.08);
+  }
+
+  .page:last-child { page-break-after: auto; }
+
+  @media print {
+    body { background: #fff; }
+    .page { margin: 0; box-shadow: none; }
+  }
+
+  /* ── Page 1 header ──────────────────────── */
+  .pg1-header {
+    padding: 12mm 16mm 10mm;
+    border-bottom: 1pt solid var(--border);
+  }
+
+  .header-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 8pt;
+  }
+
+  .brand-line {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 7pt;
+    letter-spacing: .18em;
+    text-transform: uppercase;
+    color: var(--ink-4);
+    margin-bottom: 4pt;
+  }
+
+  .report-title {
+    font-family: 'Libre Baskerville', serif;
+    font-size: 21pt;
+    font-weight: 700;
+    color: var(--ink);
+    line-height: 1.18;
+    margin-bottom: 3pt;
+  }
+
+  .report-addr {
+    font-size: 9pt;
+    color: var(--ink-3);
+  }
+
+  .doc-block {
+    text-align: right;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 7pt;
+    color: var(--ink-4);
+    line-height: 2;
+  }
+
+  .risk-flag {
+    display: inline-block;
+    background: var(--danger);
+    color: #fff;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 7pt;
+    font-weight: 500;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    padding: 3pt 8pt;
+    border-radius: 3pt;
+    margin-top: 4pt;
+  }
+
+  /* ── Continued page header ──────────────── */
+  .pg-header-cont {
+    padding: 8pt 16mm;
+    border-bottom: 1pt solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .pg-cont-title {
+    font-size: 9pt;
+    font-weight: 600;
+    color: var(--ink);
+  }
+
+  .pg-cont-ref {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 7pt;
+    color: var(--ink-4);
+  }
+
+  /* ── Body padding ───────────────────────── */
+  .body  { padding: 10pt 16mm 20mm; }
+
+  /* ── Footer ─────────────────────────────── */
+  .page-footer {
+    position: absolute;
+    bottom: 8mm;
+    left: 16mm; right: 16mm;
+    display: flex;
+    justify-content: space-between;
+    border-top: .5pt solid var(--border);
+    padding-top: 5pt;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 6.5pt;
+    color: var(--ink-4);
+  }
+
+  /* ── Section label ──────────────────────── */
+  .sec {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 6.5pt;
+    letter-spacing: .16em;
+    text-transform: uppercase;
+    color: var(--ink-4);
+    border-bottom: .5pt solid var(--border);
+    padding-bottom: 5pt;
+    margin-bottom: 10pt;
+  }
+
+  .section { margin-bottom: 16pt; }
+
+  /* ── Risk score block ───────────────────── */
+  .risk-block {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    border: 1pt solid var(--border);
+    border-radius: 6pt;
+    overflow: hidden;
+    margin-bottom: 14pt;
+  }
+
+  .risk-score-col {
+    padding: 14pt 16pt;
+    background: var(--danger);
+    color: #fff;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-width: 70pt;
+  }
+
+  .risk-num {
+    font-family: 'Libre Baskerville', serif;
+    font-size: 36pt;
+    font-weight: 700;
+    line-height: 1;
+  }
+
+  .risk-of {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 7.5pt;
+    opacity: .65;
+    margin-top: 2pt;
+  }
+
+  .risk-detail-col {
+    padding: 11pt 13pt;
+    background: var(--dan-lt);
+  }
+
+  .risk-verdict {
+    font-size: 11pt;
+    font-weight: 700;
+    color: var(--dan-dk);
+    margin-bottom: 4pt;
+  }
+
+  .risk-body {
+    font-size: 8pt;
+    color: var(--ink-2);
+    line-height: 1.6;
+  }
+
+  .risk-bar-row {
+    display: flex;
+    align-items: center;
+    gap: 7pt;
+    margin-top: 8pt;
+  }
+
+  .rbar {
+    flex: 1;
+    height: 4pt;
+    background: rgba(220,38,38,.15);
+    border-radius: 2pt;
+    overflow: hidden;
+  }
+
+  .rbar-fill {
+    height: 100%;
+    border-radius: 2pt;
+    background: var(--danger);
+  }
+
+  .rbar-pct {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 7pt;
+    color: var(--dan-dk);
+    min-width: 28pt;
+    text-align: right;
+  }
+
+  /* ── Prop grid ──────────────────────────── */
+  .prop-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 7pt;
+    margin-bottom: 14pt;
+  }
+
+  .prop {
+    border: .5pt solid var(--border);
+    border-radius: 5pt;
+    padding: 7pt 9pt;
+    background: var(--bg);
+  }
+
+  .plbl { font-size: 7pt; color: var(--ink-4); text-transform: uppercase; letter-spacing: .05em; font-weight: 500; margin-bottom: 2pt; }
+  .pval { font-size: 8.5pt; font-weight: 600; color: var(--ink); }
+  .pmono { font-family: 'IBM Plex Mono', monospace; font-size: 7.5pt; font-weight: 400; }
+
+  /* ── KPI row ────────────────────────────── */
+  .kpi-row {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 7pt;
+    margin-bottom: 14pt;
+  }
+
+  .kpi {
+    border: .5pt solid var(--border);
+    border-radius: 5pt;
+    padding: 9pt 7pt;
+    text-align: center;
+  }
+
+  .kval {
+    font-family: 'Libre Baskerville', serif;
+    font-size: 20pt;
+    font-weight: 700;
+    line-height: 1;
+    margin-bottom: 2pt;
+  }
+
+  .klbl {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 6pt;
+    text-transform: uppercase;
+    letter-spacing: .08em;
+    color: var(--ink-4);
+    margin-bottom: 3pt;
+  }
+
+  .kdelta { font-size: 7.5pt; font-weight: 500; }
+
+  .c-d { color: var(--danger); }
+  .c-w { color: var(--warn); }
+  .c-o { color: var(--ok); }
+  .c-a { color: var(--accent); }
+
+  /* ── Two col ────────────────────────────── */
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 10pt; }
+
+  /* ── Chart card ─────────────────────────── */
+  .chart-card {
+    border: .5pt solid var(--border);
+    border-radius: 6pt;
+    padding: 10pt 11pt;
+  }
+
+  .ctitle {
+    font-size: 7.5pt;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: .05em;
+    color: var(--ink-3);
+    margin-bottom: 8pt;
+  }
+
+  /* ── Heatmap ────────────────────────────── */
+  .hmap {
+    display: grid;
+    grid-template-columns: 42pt repeat(7, 1fr);
+    gap: 2.5pt;
+  }
+
+  .hm-lbl {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 6pt;
+    color: var(--ink-4);
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    padding-right: 4pt;
+  }
+
+  .hm-day {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 6pt;
+    color: var(--ink-4);
+    text-align: center;
+    padding-bottom: 2pt;
+  }
+
+  .hm-cell { height: 13pt; border-radius: 2pt; }
+
+  /* ── Crime table ────────────────────────── */
+  .crime-tbl { width: 100%; border-collapse: collapse; font-size: 7.5pt; }
+
+  .crime-tbl th {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 6pt;
+    text-transform: uppercase;
+    letter-spacing: .1em;
+    color: var(--ink-4);
+    font-weight: 500;
+    padding: 5pt 6pt;
+    border-bottom: 1pt solid var(--border);
+    text-align: left;
+    background: var(--bg);
+    white-space: nowrap;
+  }
+
+  .crime-tbl td {
+    padding: 5.5pt 6pt;
+    border-bottom: .5pt solid var(--border);
+    vertical-align: middle;
+  }
+
+  .crime-tbl tr:last-child td { border-bottom: none; }
+  .num { text-align: right; font-family: 'IBM Plex Mono', monospace; }
+
+  /* ── Pills ──────────────────────────────── */
+  .pill {
+    display: inline-block;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 6pt;
+    font-weight: 500;
+    padding: 2pt 5pt;
+    border-radius: 3pt;
+    white-space: nowrap;
+  }
+
+  .pill-crit { background: var(--dan-lt); color: var(--dan-dk); }
+  .pill-h    { background: #FEF3C7;       color: #92400E; }
+  .pill-m    { background: var(--acc-lt); color: var(--acc-dk); }
+  .pill-l    { background: var(--ok-lt);  color: var(--ok-dk); }
+
+  .trend {
+    display: inline-block;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 6pt;
+    padding: 2pt 5pt;
+    border-radius: 3pt;
+  }
+
+  .t-up  { background: var(--dan-lt); color: var(--dan-dk); }
+  .t-dn  { background: var(--ok-lt);  color: var(--ok-dk); }
+  .t-stb { background: var(--bg);     color: var(--ink-3); }
+
+  /* ── Station card ───────────────────────── */
+  .station {
+    display: flex;
+    gap: 10pt;
+    border: .5pt solid var(--border);
+    border-radius: 6pt;
+    padding: 9pt 11pt;
+    margin-bottom: 7pt;
+    align-items: flex-start;
+  }
+
+  .s-icon {
+    width: 26pt; height: 26pt;
+    background: var(--ink);
+    color: #fff;
+    border-radius: 5pt;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12pt;
+    flex-shrink: 0;
+  }
+
+  .s-icon.sec { background: var(--bg); color: var(--ink); border: .5pt solid var(--border); }
+
+  .sname { font-size: 9pt; font-weight: 700; margin-bottom: 2pt; }
+  .sdet  { font-size: 7.5pt; color: var(--ink-3); line-height: 1.6; }
+
+  .sbadge {
+    margin-left: auto;
+    flex-shrink: 0;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 6.5pt;
+    padding: 2pt 6pt;
+    border-radius: 3pt;
+    white-space: nowrap;
+  }
+
+  .sb-pri { background: var(--ink); color: #fff; }
+  .sb-sec { background: var(--bg);  color: var(--ink-3); border: .5pt solid var(--border); }
+
+  /* ── Insight ────────────────────────────── */
+  .insight { display: flex; gap: 7pt; margin-bottom: 7pt; align-items: flex-start; }
+  .idot { width: 6pt; height: 6pt; border-radius: 50%; flex-shrink: 0; margin-top: 2.5pt; }
+  .id-d { background: var(--danger); }
+  .id-w { background: var(--warn); }
+  .id-o { background: var(--ok); }
+  .itext { font-size: 8pt; color: var(--ink-2); line-height: 1.55; }
+  .itext strong { color: var(--ink); }
+
+  /* ── Bench ──────────────────────────────── */
+  .bench { margin-bottom: 7pt; display: flex; align-items: center; gap: 7pt; }
+  .blbl  { font-size: 7.5pt; color: var(--ink-2); min-width: 90pt; font-weight: 500; }
+
+  .bbar-outer {
+    flex: 1;
+    height: 8pt;
+    background: var(--border);
+    border-radius: 3pt;
+    overflow: hidden;
+  }
+
+  .bbar-inner {
+    height: 100%;
+    border-radius: 3pt;
+    display: flex;
+    align-items: center;
+    padding-right: 4pt;
+    justify-content: flex-end;
+  }
+
+  .bval { font-family: 'IBM Plex Mono', monospace; font-size: 6pt; color: #fff; font-weight: 500; }
+
+  /* ── Rec grid ───────────────────────────── */
+  .rec-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8pt; }
+
+  .rec-card {
+    border: .5pt solid var(--border);
+    border-radius: 6pt;
+    padding: 8pt 10pt;
+  }
+
+  .rec-title {
+    font-size: 7.5pt;
+    font-weight: 700;
+    margin-bottom: 6pt;
+    display: flex;
+    align-items: center;
+    gap: 5pt;
+  }
+
+  .rec-dot { width: 5pt; height: 5pt; border-radius: 50%; }
+
+  .rec-item {
+    font-size: 7.5pt;
+    color: var(--ink-2);
+    line-height: 1.55;
+    padding-left: 10pt;
+    position: relative;
+    margin-bottom: 3pt;
+  }
+
+  .rec-item::before { content: '—'; position: absolute; left: 0; color: var(--ink-4); }
+
+  /* ── Legend ─────────────────────────────── */
+  .legend {
+    display: flex;
+    gap: 10pt;
+    flex-wrap: wrap;
+    margin-top: 6pt;
+  }
+
+  .leg {
+    display: flex;
+    align-items: center;
+    gap: 4pt;
+    font-size: 7pt;
+    color: var(--ink-3);
+  }
+
+  .lsw { width: 8pt; height: 8pt; border-radius: 2pt; }
+
+  /* ── Disclaimer ─────────────────────────── */
+  .disclaimer {
+    background: var(--bg);
+    border: .5pt solid var(--border);
+    border-radius: 4pt;
+    padding: 8pt 10pt;
+    font-size: 7pt;
+    color: var(--ink-4);
+    line-height: 1.6;
+  }
+
+</style>
+</head>
+<body>
+
+
+<!-- ═══════════════════════ PAGE 1 ═══ -->
+<div class="page">
+  <div class="pg1-header">
+    <div class="header-top">
+      <div>
+        <div class="brand-line">SafeZone Intelligence — Property Security Report</div>
+        <div class="report-title">41 Fifth Avenue, Belgravia</div>
+        <div class="report-addr">Cape Town, Western Cape 7764 &nbsp;·&nbsp; Residential &nbsp;·&nbsp; Athlone SAPS Precinct</div>
+        <div><span class="risk-flag">&#9679; High Risk — 74th percentile, Western Cape</span></div>
+      </div>
+      <div class="doc-block">
+        REF: SZ-WC-2024-08813<br>
+        28 March 2026<br>
+        CONFIDENTIAL
+      </div>
+    </div>
+  </div>
+
+  <div class="body">
+
+    <!-- Risk block -->
+    <div class="section">
+      <div class="sec">Overall risk assessment</div>
+      <div class="risk-block">
+        <div class="risk-score-col">
+          <div class="risk-num">74</div>
+          <div class="risk-of">/ 100</div>
+        </div>
+        <div class="risk-detail-col">
+          <div class="risk-verdict">HIGH RISK — Above provincial average</div>
+          <div class="risk-body">
+            This property falls within the Athlone SAPS precinct, which ranks in the <strong>74th percentile</strong> across 145 Western Cape precincts. Total reported crime rose 7.3% year-on-year, against a provincial average of 2.1%, driven primarily by residential burglary and violent assault.
+          </div>
+          <div class="risk-bar-row">
+            <span style="font-family:'IBM Plex Mono',monospace;font-size:6pt;color:#9CA3AF;">LOW</span>
+            <div class="rbar"><div class="rbar-fill" style="width:74%;"></div></div>
+            <span style="font-family:'IBM Plex Mono',monospace;font-size:6pt;color:#9CA3AF;">HIGH</span>
+            <div class="rbar-pct">74 / 100</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Props -->
+    <div class="section">
+      <div class="sec">Property details</div>
+      <div class="prop-grid">
+        <div class="prop"><div class="plbl">Municipality</div><div class="pval">City of Cape Town</div></div>
+        <div class="prop"><div class="plbl">SAPS precinct</div><div class="pval">Athlone</div></div>
+        <div class="prop"><div class="plbl">Land use</div><div class="pval">Urban residential</div></div>
+        <div class="prop"><div class="plbl">Coordinates</div><div class="pval pmono">33.9572° S, 18.5046° E</div></div>
+        <div class="prop"><div class="plbl">Data period</div><div class="pval">Apr 2023 – Mar 2024</div></div>
+        <div class="prop"><div class="plbl">Suburb</div><div class="pval">Belgravia</div></div>
+      </div>
+    </div>
+
+    <!-- KPIs -->
+    <div class="section">
+      <div class="sec">Key metrics — Athlone precinct</div>
+      <div class="kpi-row">
+        <div class="kpi">
+          <div class="kval c-d">2,244</div>
+          <div class="klbl">Total incidents</div>
+          <div class="kdelta c-d">↑ +7.3% YoY</div>
+        </div>
+        <div class="kpi">
+          <div class="kval c-w">1.8km</div>
+          <div class="klbl">Nearest station</div>
+          <div class="kdelta c-w">~4 min response</div>
+        </div>
+        <div class="kpi">
+          <div class="kval c-d">389</div>
+          <div class="klbl">Burglaries p.a.</div>
+          <div class="kdelta c-d">↑ +9.3% YoY</div>
+        </div>
+        <div class="kpi">
+          <div class="kval c-d">7</div>
+          <div class="klbl">Rising categories</div>
+          <div class="kdelta c-o">2 declining</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Charts -->
+    <div class="section">
+      <div class="sec">Risk profile &amp; crime composition</div>
+      <div class="two-col">
+        <div class="chart-card">
+          <div class="ctitle">Precinct risk profile vs WC average</div>
+          <div style="position:relative;height:155pt;">
+            <canvas id="radarChart"></canvas>
+          </div>
+          <div class="legend">
+            <div class="leg"><div class="lsw" style="background:#111827;"></div>Athlone precinct</div>
+            <div class="leg"><div class="lsw" style="background:#D1D5DB;"></div>WC average</div>
+          </div>
+        </div>
+        <div class="chart-card">
+          <div class="ctitle">Crime composition by type</div>
+          <div style="display:flex;align-items:center;gap:11pt;">
+            <div style="position:relative;height:115pt;width:115pt;flex-shrink:0;">
+              <canvas id="donutChart"></canvas>
+            </div>
+            <div>
+              <div class="leg" style="margin-bottom:6pt;"><div class="lsw" style="background:#111827;"></div>Property 37%</div>
+              <div class="leg" style="margin-bottom:6pt;"><div class="lsw" style="background:#DC2626;"></div>Violent 31%</div>
+              <div class="leg" style="margin-bottom:6pt;"><div class="lsw" style="background:#D97706;"></div>Drug 14%</div>
+              <div class="leg" style="margin-bottom:6pt;"><div class="lsw" style="background:#2563EB;"></div>Vehicle 12%</div>
+              <div class="leg"><div class="lsw" style="background:#D1D5DB;"></div>Other 6%</div>
+            </div>
+          </div>
+          <div style="margin-top:10pt;">
+            <div class="ctitle" style="margin-bottom:5pt;">5-year incident trend</div>
+            <div style="position:relative;height:65pt;">
+              <canvas id="miniTrend"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="page-footer">
+    <span>SafeZone Intelligence · REF: SZ-WC-2024-08813 · For informational use only</span>
+    <span>Page 1 of 3</span>
+  </div>
+</div>
+
+
+<!-- ═══════════════════════ PAGE 2 ═══ -->
+<div class="page">
+  <div class="pg-header-cont">
+    <div class="pg-cont-title">Crime Statistics &amp; Temporal Analysis — Athlone Precinct</div>
+    <div class="pg-cont-ref">REF: SZ-WC-2024-08813</div>
+  </div>
+
+  <div class="body" style="padding-top:10pt;">
+
+    <!-- Bar chart -->
+    <div class="section">
+      <div class="sec">Annual incidents by category — Apr 2023 to Mar 2024</div>
+      <div class="chart-card">
+        <div style="position:relative;height:155pt;">
+          <canvas id="barChart"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- Heatmap + trend -->
+    <div class="section">
+      <div class="two-col">
+        <div class="chart-card">
+          <div class="ctitle">Incident risk — day &amp; time of day</div>
+          <div class="hmap">
+            <div></div>
+            <div class="hm-day">Mon</div><div class="hm-day">Tue</div><div class="hm-day">Wed</div>
+            <div class="hm-day">Thu</div><div class="hm-day">Fri</div><div class="hm-day">Sat</div><div class="hm-day">Sun</div>
+            <!-- 00-06 -->
+            <div class="hm-lbl">00–06</div>
+            <div class="hm-cell" style="background:rgba(17,24,39,0.06);"></div>
+            <div class="hm-cell" style="background:rgba(17,24,39,0.05);"></div>
+            <div class="hm-cell" style="background:rgba(17,24,39,0.06);"></div>
+            <div class="hm-cell" style="background:rgba(17,24,39,0.05);"></div>
+            <div class="hm-cell" style="background:rgba(17,24,39,0.12);"></div>
+            <div class="hm-cell" style="background:rgba(17,24,39,0.38);"></div>
+            <div class="hm-cell" style="background:rgba(17,24,39,0.44);"></div>
+            <!-- 06-12 -->
+            <div class="hm-lbl">06–12</div>
+            <div class="hm-cell" style="background:rgba(17,24,39,0.52);"></div>
+            <div class="hm-cell" style="background:rgba(17,24,39,0.58);"></div>
+            <div class="hm-cell" style="background:rgba(17,24,39,0.60);"></div>
+            <div class="hm-cell" style="background:rgba(17,24,39,0.56);"></div>
+            <div class="hm-cell" style="background:rgba(17,24,39,0.48);"></div>
+            <div class="hm-cell" style="background:rgba(17,24,39,0.22);"></div>
+            <div class="hm-cell" style="background:rgba(17,24,39,0.18);"></div>
+            <!-- 12-18 -->
+            <div class="hm-lbl">12–18</div>
+            <div class="hm-cell" style="background:rgba(17,24,39,0.35);"></div>
+            <div class="hm-cell" style="background:rgba(17,24,39,0.38);"></div>
+            <div class="hm-cell" style="background:rgba(17,24,39,0.40);"></div>
+            <div class="hm-cell" style="background:rgba(17,24,39,0.36);"></div>
+            <div class="hm-cell" style="background:rgba(17,24,39,0.85);"></div>
+            <div class="hm-cell" style="background:rgba(17,24,39,0.70);"></div>
+            <div class="hm-cell" style="background:rgba(17,24,39,0.42);"></div>
+            <!-- 18-24 -->
+            <div class="hm-lbl">18–24</div>
+            <div class="hm-cell" style="background:rgba(17,24,39,0.25);"></div>
+            <div class="hm-cell" style="background:rgba(17,24,39,0.28);"></div>
+            <div class="hm-cell" style="background:rgba(17,24,39,0.20);"></div>
+            <div class="hm-cell" style="background:rgba(17,24,39,0.24);"></div>
+            <div class="hm-cell" style="background:rgba(17,24,39,1.00);"></div>
+            <div class="hm-cell" style="background:rgba(17,24,39,0.95);"></div>
+            <div class="hm-cell" style="background:rgba(17,24,39,0.52);"></div>
+          </div>
+          <div class="legend" style="margin-top:7pt;">
+            <div class="leg"><div class="lsw" style="background:rgba(17,24,39,0.06);border:.5pt solid #E5E7EB;"></div>Low</div>
+            <div class="leg"><div class="lsw" style="background:rgba(17,24,39,0.45);"></div>Medium</div>
+            <div class="leg"><div class="lsw" style="background:rgba(17,24,39,1.0);"></div>High</div>
+          </div>
+        </div>
+
+        <div class="chart-card">
+          <div class="ctitle">Year-on-year trend (2019–2024)</div>
+          <div style="position:relative;height:100pt;">
+            <canvas id="trendChart"></canvas>
+          </div>
+          <div style="margin-top:10pt;">
+            <div class="ctitle" style="margin-bottom:5pt;">Monthly distribution — 2023/24</div>
+            <div style="position:relative;height:62pt;">
+              <canvas id="monthChart"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Crime table -->
+    <div class="section">
+      <div class="sec">Detailed incident breakdown — Athlone precinct 2023/24</div>
+      <table class="crime-tbl">
+        <thead>
+          <tr>
+            <th>Category</th>
+            <th>Severity</th>
+            <th class="num">Incidents</th>
+            <th class="num">Prior year</th>
+            <th class="num">YoY change</th>
+            <th>Trend</th>
+            <th class="num">Share</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>Residential burglary</td><td><span class="pill pill-crit">Critical</span></td><td class="num">389</td><td class="num">356</td><td class="num c-d">+9.3%</td><td><span class="trend t-up">↑ Rising</span></td><td class="num" style="color:var(--ink-4);">17.3%</td></tr>
+          <tr><td>Common assault</td><td><span class="pill pill-h">High</span></td><td class="num">362</td><td class="num">351</td><td class="num c-d">+3.1%</td><td><span class="trend t-up">↑ Rising</span></td><td class="num" style="color:var(--ink-4);">16.1%</td></tr>
+          <tr><td>Drug-related crime</td><td><span class="pill pill-h">High</span></td><td class="num">314</td><td class="num">327</td><td class="num c-o">−4.0%</td><td><span class="trend t-dn">↓ Declining</span></td><td class="num" style="color:var(--ink-4);">14.0%</td></tr>
+          <tr><td>Theft from motor vehicle</td><td><span class="pill pill-m">Medium</span></td><td class="num">283</td><td class="num">254</td><td class="num c-d">+11.4%</td><td><span class="trend t-up">↑ Rising</span></td><td class="num" style="color:var(--ink-4);">12.6%</td></tr>
+          <tr><td>Aggravated robbery</td><td><span class="pill pill-crit">Critical</span></td><td class="num">211</td><td class="num">199</td><td class="num c-d">+6.0%</td><td><span class="trend t-up">↑ Rising</span></td><td class="num" style="color:var(--ink-4);">9.4%</td></tr>
+          <tr><td>Commercial theft</td><td><span class="pill pill-l">Low</span></td><td class="num">183</td><td class="num">197</td><td class="num c-o">−7.1%</td><td><span class="trend t-dn">↓ Declining</span></td><td class="num" style="color:var(--ink-4);">8.2%</td></tr>
+          <tr><td>Malicious damage to property</td><td><span class="pill pill-m">Medium</span></td><td class="num">168</td><td class="num">171</td><td class="num" style="color:var(--ink-3);">−1.8%</td><td><span class="trend t-stb">→ Stable</span></td><td class="num" style="color:var(--ink-4);">7.5%</td></tr>
+          <tr><td>Common robbery</td><td><span class="pill pill-m">Medium</span></td><td class="num">155</td><td class="num">152</td><td class="num" style="color:var(--ink-3);">+2.0%</td><td><span class="trend t-stb">→ Stable</span></td><td class="num" style="color:var(--ink-4);">6.9%</td></tr>
+          <tr><td>Assault GBH</td><td><span class="pill pill-h">High</span></td><td class="num">131</td><td class="num">123</td><td class="num c-d">+6.5%</td><td><span class="trend t-up">↑ Rising</span></td><td class="num" style="color:var(--ink-4);">5.8%</td></tr>
+          <tr><td>Sexual offences</td><td><span class="pill pill-crit">Critical</span></td><td class="num">84</td><td class="num">86</td><td class="num" style="color:var(--ink-3);">−2.3%</td><td><span class="trend t-stb">→ Stable</span></td><td class="num" style="color:var(--ink-4);">3.7%</td></tr>
+          <tr><td>Carjacking</td><td><span class="pill pill-crit">Critical</span></td><td class="num">31</td><td class="num">27</td><td class="num c-d">+14.8%</td><td><span class="trend t-up">↑ Rising</span></td><td class="num" style="color:var(--ink-4);">1.4%</td></tr>
+          <tr><td>Murder</td><td><span class="pill pill-crit">Critical</span></td><td class="num">28</td><td class="num">27</td><td class="num c-d">+3.7%</td><td><span class="trend t-up">↑ Rising</span></td><td class="num" style="color:var(--ink-4);">1.2%</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+  </div>
+
+  <div class="page-footer">
+    <span>SafeZone Intelligence · REF: SZ-WC-2024-08813 · For informational use only</span>
+    <span>Page 2 of 3</span>
+  </div>
+</div>
+
+
+<!-- ═══════════════════════ PAGE 3 ═══ -->
+<div class="page">
+  <div class="pg-header-cont">
+    <div class="pg-cont-title">Intelligence Findings, Benchmarking &amp; Recommendations</div>
+    <div class="pg-cont-ref">REF: SZ-WC-2024-08813</div>
+  </div>
+
+  <div class="body" style="padding-top:10pt;">
+
+    <!-- Stations -->
+    <div class="section">
+      <div class="sec">Nearest SAPS police stations</div>
+      <div class="station">
+        <div class="s-icon">🚔</div>
+        <div style="flex:1;">
+          <div class="sname">Athlone Police Station</div>
+          <div class="sdet">Klipfontein Road, Athlone · Tel: 021 684 4600 · Emergency: 10111</div>
+          <div class="sdet"><strong>1.8 km</strong> · ~4 min drive · Primary jurisdiction</div>
+        </div>
+        <span class="sbadge sb-pri">Primary</span>
+      </div>
+      <div class="station">
+        <div class="s-icon sec">🚔</div>
+        <div style="flex:1;">
+          <div class="sname">Woodstock Police Station</div>
+          <div class="sdet">Victoria Road, Woodstock · Tel: 021 462 2800 · Emergency: 10111</div>
+          <div class="sdet"><strong>4.3 km</strong> · ~9 min drive · Secondary coverage</div>
+        </div>
+        <span class="sbadge sb-sec">Secondary</span>
+      </div>
+      <div class="station">
+        <div class="s-icon sec">🚔</div>
+        <div style="flex:1;">
+          <div class="sname">Rondebosch Police Station</div>
+          <div class="sdet">Main Road, Rondebosch · Tel: 021 686 8800 · Emergency: 10111</div>
+          <div class="sdet"><strong>5.1 km</strong> · ~11 min drive · Tertiary coverage</div>
+        </div>
+        <span class="sbadge sb-sec">Tertiary</span>
+      </div>
+    </div>
+
+    <!-- Findings -->
+    <div class="section">
+      <div class="sec">Key intelligence findings</div>
+      <div class="two-col">
+        <div>
+          <div class="insight"><div class="idot id-d"></div><div class="itext"><strong>Residential burglary is the dominant threat</strong> at 389 incidents p.a., rising 9.3% YoY. Peak exposure is weekday mornings (06:00–12:00) when properties are unoccupied.</div></div>
+          <div class="insight"><div class="idot id-d"></div><div class="itext"><strong>Carjacking up 14.8% YoY</strong> — fastest-growing crime in the precinct. Highest risk on Friday–Saturday evenings on arterial roads near this property.</div></div>
+          <div class="insight"><div class="idot id-d"></div><div class="itext"><strong>Vehicle theft up 11.4%.</strong> Secured, enclosed garaging is strongly recommended. Street parking after 18:00 carries elevated overnight risk.</div></div>
+        </div>
+        <div>
+          <div class="insight"><div class="idot id-w"></div><div class="itext"><strong>Assault GBH rising 6.5%</strong> — a marker of sustained social instability. Incidents cluster around liquor outlets 300–600m north-west of this property.</div></div>
+          <div class="insight"><div class="idot id-w"></div><div class="itext"><strong>Friday and Saturday 18:00–24:00 is the highest-risk window</strong> across all categories, coinciding with reduced patrol visibility on Klipfontein Road.</div></div>
+          <div class="insight"><div class="idot id-o"></div><div class="itext"><strong>Drug crime down 4.0% and commercial theft down 7.1%</strong> — both declining, attributed to targeted SAPS enforcement operations in Q3 2023.</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bench + Recs -->
+    <div class="two-col">
+      <div>
+        <div class="sec" style="margin-bottom:10pt;">Comparative risk benchmarking</div>
+        <div class="chart-card">
+          <div class="ctitle">Risk index vs comparable precincts (/ 100)</div>
+          <div style="margin-top:4pt;">
+            <div class="bench"><div class="blbl">Athlone (this property)</div><div class="bbar-outer"><div class="bbar-inner" style="width:74%;background:#DC2626;"><span class="bval">74</span></div></div></div>
+            <div class="bench"><div class="blbl">Khayelitsha</div><div class="bbar-outer"><div class="bbar-inner" style="width:91%;background:#7F1D1D;"><span class="bval">91</span></div></div></div>
+            <div class="bench"><div class="blbl">Mitchells Plain</div><div class="bbar-outer"><div class="bbar-inner" style="width:83%;background:#991B1B;"><span class="bval">83</span></div></div></div>
+            <div class="bench"><div class="blbl">WC Provincial avg</div><div class="bbar-outer"><div class="bbar-inner" style="width:51%;background:#6B7280;"><span class="bval">51</span></div></div></div>
+            <div class="bench"><div class="blbl">Rondebosch</div><div class="bbar-outer"><div class="bbar-inner" style="width:38%;background:#374151;"><span class="bval">38</span></div></div></div>
+            <div class="bench"><div class="blbl">Constantia</div><div class="bbar-outer"><div class="bbar-inner" style="width:29%;background:#374151;"><span class="bval">29</span></div></div></div>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <div class="sec" style="margin-bottom:10pt;">Security recommendations</div>
+        <div class="rec-grid">
+          <div class="rec-card">
+            <div class="rec-title"><div class="rec-dot" style="background:var(--danger);"></div>Perimeter</div>
+            <div class="rec-item">Electric fencing or spike top on all boundary walls</div>
+            <div class="rec-item">Motion-sensor lighting front and rear</div>
+            <div class="rec-item">CCTV covering driveway and street entry</div>
+          </div>
+          <div class="rec-card">
+            <div class="rec-title"><div class="rec-dot" style="background:var(--danger);"></div>Access control</div>
+            <div class="rec-item">Double-lock all exterior doors and windows</div>
+            <div class="rec-item">Burglar bars on all ground-floor windows</div>
+            <div class="rec-item">Gate motor with backup battery power</div>
+          </div>
+          <div class="rec-card">
+            <div class="rec-title"><div class="rec-dot" style="background:var(--warn);"></div>Vehicles</div>
+            <div class="rec-item">Enclose vehicles in locked garage overnight</div>
+            <div class="rec-item">GPS tracker on all registered vehicles</div>
+            <div class="rec-item">Avoid street parking after 18:00 Fri–Sat</div>
+          </div>
+          <div class="rec-card">
+            <div class="rec-title"><div class="rec-dot" style="background:var(--ok);"></div>Monitoring</div>
+            <div class="rec-item">Register with a local armed response company</div>
+            <div class="rec-item">Join the Belgravia neighbourhood watch</div>
+            <div class="rec-item">Enable SAPS MySAPS crime alert notifications</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Disclaimer -->
+    <div style="margin-top:12pt;">
+      <div class="disclaimer">
+        <strong>Disclaimer:</strong> This report is compiled from publicly available SAPS crime statistics (2023/24 financial year) and does not constitute legal, insurance, or personal safety advice. Crime statistics reflect reported incidents at precinct level and may not precisely reflect conditions at this specific address. Response times are estimates only. SafeZone Intelligence accepts no liability for decisions made on the basis of this report.
+      </div>
+    </div>
+
+  </div>
+
+  <div class="page-footer">
+    <span>SafeZone Intelligence · REF: SZ-WC-2024-08813 · For informational use only</span>
+    <span>Page 3 of 3</span>
+  </div>
+</div>
+
+
+<script>
+const INK = '#111827', GRAY = '#9CA3AF', RED = '#DC2626', BLUE = '#2563EB';
+const AMBER = '#D97706', GREEN = '#059669', BORDER = '#E5E7EB';
+const font = { family: "'IBM Plex Mono', monospace", size: 7 };
+
+Chart.defaults.font = font;
+Chart.defaults.color = GRAY;
+
+// Radar
+new Chart(document.getElementById('radarChart'), {
+  type: 'radar',
+  data: {
+    labels: ['Burglary','Violent','Drug','Vehicle','Robbery','Sexual'],
+    datasets: [
+      { label: 'Athlone', data: [82,76,68,71,74,65], backgroundColor: 'rgba(17,24,39,.12)', borderColor: INK, borderWidth: 1.5, pointBackgroundColor: INK, pointRadius: 3 },
+      { label: 'WC Avg',  data: [51,48,52,44,50,45], backgroundColor: 'rgba(209,213,219,.1)', borderColor: GRAY, borderWidth: 1, borderDash: [4,3], pointBackgroundColor: GRAY, pointRadius: 2 },
+    ]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    plugins: { legend: { display: false } },
+    scales: {
+      r: {
+        min: 0, max: 100,
+        ticks: { stepSize: 25, font: { size: 6 }, backdropColor: 'transparent' },
+        grid: { color: BORDER },
+        pointLabels: { font: { size: 7 }, color: '#374151' }
+      }
+    }
+  }
+});
+
+// Donut
+new Chart(document.getElementById('donutChart'), {
+  type: 'doughnut',
+  data: {
+    labels: ['Property','Violent','Drug','Vehicle','Other'],
+    datasets: [{ data: [37,31,14,12,6], backgroundColor: [INK, RED, AMBER, BLUE, GRAY], borderWidth: 0 }]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false, cutout: '62%',
+    plugins: { legend: { display: false }, tooltip: { enabled: false } }
+  }
+});
+
+// Mini trend
+new Chart(document.getElementById('miniTrend'), {
+  type: 'line',
+  data: {
+    labels: ['2019','2020','2021','2022','2023','2024'],
+    datasets: [{ data: [1820,1410,1693,1920,2090,2244], borderColor: INK, backgroundColor: 'rgba(17,24,39,.06)', borderWidth: 1.5, fill: true, tension: 0.3, pointRadius: 2.5, pointBackgroundColor: INK }]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    plugins: { legend: { display: false } },
+    scales: { x: { grid: { color: BORDER } }, y: { grid: { color: BORDER } } }
+  }
+});
+
+// Bar chart
+new Chart(document.getElementById('barChart'), {
+  type: 'bar',
+  data: {
+    labels: ['Res. Burglary','Common Assault','Drug Crime','Vehicle Theft','Aggr. Robbery','Comm. Theft','Damage','Robbery','Assault GBH','Sexual Off.','Carjacking','Murder'],
+    datasets: [{
+      label: 'Incidents',
+      data: [389,362,314,283,211,183,168,155,131,84,31,28],
+      backgroundColor: [RED,RED,AMBER,BLUE,RED,'#374151',GRAY,'#4B5563',RED,RED,'#991B1B','#991B1B'],
+      borderRadius: 3, borderSkipped: false,
+    }]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    plugins: { legend: { display: false } },
+    scales: {
+      x: { grid: { display: false }, ticks: { font: { size: 6 }, maxRotation: 30 } },
+      y: { grid: { color: BORDER }, beginAtZero: true }
+    }
+  }
+});
+
+// Trend
+new Chart(document.getElementById('trendChart'), {
+  type: 'line',
+  data: {
+    labels: ['2019/20','2020/21','2021/22','2022/23','2023/24'],
+    datasets: [
+      { label: 'Athlone', data: [1820,1410,1693,1920,2244], borderColor: INK, backgroundColor: 'rgba(17,24,39,.06)', borderWidth: 2, fill: true, tension: 0.35, pointRadius: 3, pointBackgroundColor: INK },
+      { label: 'WC Avg',  data: [1620,1300,1540,1680,1850], borderColor: GRAY, backgroundColor: 'transparent', borderWidth: 1.2, borderDash: [5,4], fill: false, tension: 0.35, pointRadius: 2, pointBackgroundColor: GRAY }
+    ]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    plugins: { legend: { display: true, labels: { font: { size: 7 }, boxWidth: 12, boxHeight: 4, padding: 10 } } },
+    scales: { x: { grid: { color: BORDER } }, y: { grid: { color: BORDER }, beginAtZero: false } }
+  }
+});
+
+// Monthly
+new Chart(document.getElementById('monthChart'), {
+  type: 'bar',
+  data: {
+    labels: ['Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec','Jan','Feb','Mar'],
+    datasets: [{
+      data: [172,168,185,201,195,189,192,202,228,214,187,111],
+      backgroundColor: [GRAY,GRAY,AMBER,AMBER,AMBER,GRAY,GRAY,AMBER,RED,RED,GRAY,GRAY],
+      borderRadius: 2, borderSkipped: false,
+    }]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    plugins: { legend: { display: false } },
+    scales: {
+      x: { grid: { display: false }, ticks: { font: { size: 6 } } },
+      y: { grid: { color: BORDER }, beginAtZero: true }
+    }
+  }
+});
+</script>
+
+</body>
+</html>

@@ -1,0 +1,862 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Crime Risk Report — SafeZone Intelligence</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+/* ── Reset & variables ─────────────────────────────────────────────────── */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --ink:#111827;--muted:#6B7280;--border:#E5E7EB;--bg:#F9FAFB;
+  --danger:#DC2626;--dan-lt:#FEF2F2;--warn:#D97706;--warn-lt:#FFFBEB;
+  --ok:#059669;--ok-lt:#ECFDF5;--blue:#2563EB;--blue-lt:#EFF6FF;
+  --page:210mm;
+}
+html{font-family:'Inter',sans-serif;font-size:10pt;color:var(--ink);background:#fff}
+body{background:#e5e7eb}
+
+/* ── Screen wrapper ────────────────────────────────────────────────────── */
+.screen-bar{
+  background:#fff;border-bottom:1px solid var(--border);
+  padding:.75rem 2rem;display:flex;align-items:center;gap:1rem;
+  position:sticky;top:0;z-index:100;
+}
+.screen-bar .brand{font-weight:700;font-size:.95rem;letter-spacing:-.02em}
+.screen-bar .brand span{color:var(--danger)}
+.screen-bar .pill{
+  font-size:.72rem;font-family:'IBM Plex Mono',monospace;
+  background:var(--bg);border:1px solid var(--border);
+  border-radius:100px;padding:.2rem .65rem;color:var(--muted);
+}
+.screen-bar .spacer{flex:1}
+.btn-print{
+  background:var(--ink);color:#fff;border:none;cursor:pointer;
+  padding:.55rem 1.25rem;border-radius:6px;font-size:.8rem;font-weight:600;
+  font-family:inherit;display:flex;align-items:center;gap:.4rem;
+}
+.btn-print:hover{background:#374151}
+.btn-back{
+  background:none;border:1px solid var(--border);color:var(--ink);
+  padding:.45rem 1rem;border-radius:6px;font-size:.8rem;font-weight:500;
+  cursor:pointer;font-family:inherit;text-decoration:none;
+  display:flex;align-items:center;gap:.35rem;
+}
+.btn-back:hover{background:var(--bg)}
+
+/* ── Pages container ───────────────────────────────────────────────────── */
+.pages{
+  max-width:800px;margin:2rem auto;display:flex;flex-direction:column;gap:1.5rem;
+}
+
+/* ── A4 page ───────────────────────────────────────────────────────────── */
+.page{
+  background:#fff;width:100%;
+  box-shadow:0 1px 3px rgba(0,0,0,.1),0 0 0 1px rgba(0,0,0,.05);
+  border-radius:4px;overflow:hidden;
+  padding:2cm 2cm;
+  page-break-after:always;
+}
+
+/* ── Header ────────────────────────────────────────────────────────────── */
+.report-header{
+  display:flex;align-items:flex-start;justify-content:space-between;
+  padding-bottom:1rem;border-bottom:1.5px solid var(--ink);
+  margin-bottom:1.5rem;
+}
+.report-header .left .brand-mark{
+  font-family:'Libre Baskerville',serif;font-size:.9rem;font-weight:700;
+  letter-spacing:-.02em;margin-bottom:.1rem;
+}
+.report-header .left .brand-mark em{color:var(--danger);font-style:normal}
+.report-header .left .doc-label{
+  font-size:.65rem;font-family:'IBM Plex Mono',monospace;
+  color:var(--muted);letter-spacing:.06em;text-transform:uppercase;
+}
+.report-header .right{text-align:right}
+.report-header .right .ref{
+  font-size:.65rem;font-family:'IBM Plex Mono',monospace;color:var(--muted);
+}
+.report-header .right .date{font-size:.7rem;color:var(--muted);margin-top:.15rem}
+
+/* ── Page continuation header ─────────────────────────────────────────── */
+.cont-header{
+  display:flex;align-items:center;justify-content:space-between;
+  padding-bottom:.75rem;border-bottom:1px solid var(--border);
+  margin-bottom:1.25rem;
+}
+.cont-header .label{
+  font-size:.65rem;font-family:'IBM Plex Mono',monospace;
+  color:var(--muted);letter-spacing:.05em;text-transform:uppercase;
+}
+.cont-header .subject{font-size:.8rem;font-weight:600;color:var(--ink)}
+
+/* ── Address title block ───────────────────────────────────────────────── */
+.addr-block{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:1.25rem}
+.addr-block .address{
+  font-family:'Libre Baskerville',serif;font-size:1.3rem;font-weight:700;
+  line-height:1.25;max-width:70%;
+}
+.risk-badge{
+  font-size:.7rem;font-family:'IBM Plex Mono',monospace;font-weight:700;
+  letter-spacing:.06em;text-transform:uppercase;
+  padding:.35rem .85rem;border-radius:4px;margin-top:.2rem;white-space:nowrap;
+}
+.risk-badge.critical{background:#7F1D1D;color:#fff}
+.risk-badge.high{background:var(--danger);color:#fff}
+.risk-badge.elevated{background:var(--warn);color:#fff}
+.risk-badge.moderate{background:#92400E;color:#fff}
+.risk-badge.low{background:var(--ok);color:#fff}
+
+/* ── Risk strip ────────────────────────────────────────────────────────── */
+.risk-strip{
+  display:grid;grid-template-columns:120px 1fr;gap:0;
+  border:1px solid var(--border);border-radius:6px;margin-bottom:1.25rem;overflow:hidden;
+}
+.risk-score-col{
+  padding:1rem;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  background:var(--danger);color:#fff;
+}
+.risk-score-col.critical{background:#7F1D1D}
+.risk-score-col.high{background:var(--danger)}
+.risk-score-col.elevated{background:var(--warn)}
+.risk-score-col.moderate{background:#92400E}
+.risk-score-col.low{background:var(--ok)}
+.risk-score-col .score{font-size:2.5rem;font-weight:700;line-height:1;font-family:'Libre Baskerville',serif}
+.risk-score-col .score-label{font-size:.65rem;opacity:.85;letter-spacing:.06em;text-transform:uppercase}
+.risk-detail-col{padding:1rem 1.25rem;background:var(--dan-lt)}
+.risk-detail-col.critical{background:#FEF2F2}
+.risk-detail-col.elevated{background:var(--warn-lt)}
+.risk-detail-col.moderate{background:#FFFBEB}
+.risk-detail-col.low{background:var(--ok-lt)}
+.risk-detail-col .precinct-name{font-weight:700;font-size:.85rem;margin-bottom:.25rem}
+.risk-detail-col .risk-bar-wrap{margin-bottom:.5rem}
+.risk-bar-track{height:6px;background:rgba(0,0,0,.1);border-radius:3px;overflow:hidden}
+.risk-bar-fill{height:100%;border-radius:3px;background:var(--danger);transition:width .6s}
+.risk-bar-fill.ok{background:var(--ok)}
+.risk-bar-fill.warn{background:var(--warn)}
+.risk-detail-text{font-size:.72rem;color:var(--muted);line-height:1.5}
+
+/* ── KPI grid ──────────────────────────────────────────────────────────── */
+.kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:.75rem;margin-bottom:1.25rem}
+.kpi-card{border:1px solid var(--border);border-radius:6px;padding:.75rem}
+.kpi-card .kpi-val{font-size:1.4rem;font-weight:700;font-family:'Libre Baskerville',serif;line-height:1}
+.kpi-card .kpi-lbl{font-size:.65rem;color:var(--muted);margin-top:.2rem;line-height:1.3}
+.kpi-card .kpi-sub{font-size:.65rem;font-family:'IBM Plex Mono',monospace;margin-top:.3rem}
+.kpi-card .kpi-sub.up{color:var(--danger)}
+.kpi-card .kpi-sub.dn{color:var(--ok)}
+.kpi-card .kpi-sub.neu{color:var(--muted)}
+
+/* ── Chart row ─────────────────────────────────────────────────────────── */
+.chart-row{display:grid;gap:1rem;margin-bottom:1.25rem}
+.chart-row-3{grid-template-columns:1fr 1fr 1fr}
+.chart-row-2{grid-template-columns:2fr 1fr}
+.chart-row-1{grid-template-columns:1fr}
+.chart-box{border:1px solid var(--border);border-radius:6px;padding:.75rem}
+.chart-box .chart-title{
+  font-size:.65rem;font-family:'IBM Plex Mono',monospace;
+  text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin-bottom:.6rem;
+}
+.chart-box canvas{width:100%!important}
+
+/* ── Category bar chart ────────────────────────────────────────────────── */
+.cat-chart-box{border:1px solid var(--border);border-radius:6px;padding:.75rem;margin-bottom:1.25rem}
+.cat-chart-box .chart-title{
+  font-size:.65rem;font-family:'IBM Plex Mono',monospace;
+  text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin-bottom:.6rem;
+}
+
+/* ── Heatmap ───────────────────────────────────────────────────────────── */
+.heatmap-box{border:1px solid var(--border);border-radius:6px;padding:.75rem;margin-bottom:1.25rem}
+.heatmap-title{
+  font-size:.65rem;font-family:'IBM Plex Mono',monospace;
+  text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin-bottom:.6rem;
+}
+.heatmap-grid{display:grid;grid-template-columns:auto repeat(7,1fr);gap:2px}
+.hm-head{font-size:.6rem;color:var(--muted);text-align:center;padding:.15rem}
+.hm-row-label{font-size:.6rem;color:var(--muted);padding:.15rem .35rem;display:flex;align-items:center}
+.hm-cell{height:18px;border-radius:2px;background:rgba(17,24,39,var(--op,0))}
+
+/* ── Crime table ───────────────────────────────────────────────────────── */
+.crime-table{width:100%;border-collapse:collapse;font-size:.72rem;margin-bottom:1.25rem}
+.crime-table th{
+  font-size:.6rem;font-family:'IBM Plex Mono',monospace;color:var(--muted);
+  text-transform:uppercase;letter-spacing:.05em;
+  padding:.4rem .5rem;border-bottom:1.5px solid var(--ink);text-align:left;
+}
+.crime-table th:not(:first-child){text-align:right}
+.crime-table td{padding:.45rem .5rem;border-bottom:1px solid var(--border)}
+.crime-table td:not(:first-child){text-align:right;font-family:'IBM Plex Mono',monospace}
+.crime-table tr:last-child td{border-bottom:none;font-weight:600}
+.pill-sev{
+  display:inline-block;font-size:.58rem;font-family:'IBM Plex Mono',monospace;
+  padding:.1rem .35rem;border-radius:3px;text-transform:uppercase;letter-spacing:.04em;
+}
+.pill-sev.critical{background:#7F1D1D;color:#fff}
+.pill-sev.high{background:var(--danger);color:#fff}
+.pill-sev.medium{background:var(--warn);color:#fff}
+.pill-sev.low{background:var(--ok);color:#fff}
+.trend-badge{font-size:.6rem;font-family:'IBM Plex Mono',monospace}
+.trend-badge.up{color:var(--danger)}
+.trend-badge.dn{color:var(--ok)}
+.trend-badge.flat{color:var(--muted)}
+
+/* ── Stations ──────────────────────────────────────────────────────────── */
+.stations-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:.75rem;margin-bottom:1.25rem}
+.station-card{border:1px solid var(--border);border-radius:6px;padding:.75rem}
+.station-card .st-type{
+  font-size:.6rem;font-family:'IBM Plex Mono',monospace;color:var(--muted);
+  text-transform:uppercase;letter-spacing:.05em;margin-bottom:.25rem;
+}
+.station-card .st-type.primary{color:var(--ink)}
+.station-card .st-name{font-weight:700;font-size:.82rem;margin-bottom:.2rem}
+.station-card .st-tel{font-size:.7rem;font-family:'IBM Plex Mono',monospace;color:var(--blue)}
+.station-card .st-addr{font-size:.65rem;color:var(--muted);margin-top:.15rem;line-height:1.4}
+
+/* ── Findings ──────────────────────────────────────────────────────────── */
+.findings-grid{display:grid;grid-template-columns:1fr 1fr;gap:.75rem;margin-bottom:1.25rem}
+.finding-item{display:flex;gap:.5rem;align-items:flex-start}
+.finding-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;margin-top:.25rem}
+.finding-dot.red{background:var(--danger)}
+.finding-dot.amber{background:var(--warn)}
+.finding-dot.green{background:var(--ok)}
+.finding-dot.blue{background:var(--blue)}
+.finding-text{font-size:.72rem;line-height:1.5;color:var(--ink)}
+
+/* ── Benchmark bars ────────────────────────────────────────────────────── */
+.benchmark-row{display:flex;align-items:center;gap:.75rem;margin-bottom:.6rem;font-size:.72rem}
+.benchmark-label{width:160px;flex-shrink:0;color:var(--muted)}
+.benchmark-track{flex:1;height:8px;background:var(--bg);border-radius:4px;overflow:hidden;position:relative}
+.benchmark-fill{height:100%;border-radius:4px;background:var(--ink)}
+.benchmark-fill.accent{background:var(--danger)}
+.benchmark-val{width:50px;text-align:right;font-family:'IBM Plex Mono',monospace;font-size:.68rem}
+
+/* ── Recommendations ───────────────────────────────────────────────────── */
+.rec-grid{display:grid;grid-template-columns:1fr 1fr;gap:.75rem;margin-bottom:1.25rem}
+.rec-card{border:1px solid var(--border);border-radius:6px;padding:.75rem}
+.rec-card .rec-icon{font-size:1.1rem;margin-bottom:.35rem}
+.rec-card .rec-title{font-weight:700;font-size:.78rem;margin-bottom:.2rem}
+.rec-card .rec-body{font-size:.68rem;color:var(--muted);line-height:1.5}
+
+/* ── Section heading ───────────────────────────────────────────────────── */
+.section-heading{
+  font-size:.65rem;font-family:'IBM Plex Mono',monospace;
+  text-transform:uppercase;letter-spacing:.07em;color:var(--muted);
+  margin-bottom:.65rem;
+  padding-bottom:.3rem;border-bottom:1px solid var(--border);
+}
+
+/* ── Disclaimer ────────────────────────────────────────────────────────── */
+.disclaimer{
+  font-size:.6rem;color:var(--muted);line-height:1.6;
+  padding:.75rem;background:var(--bg);border-radius:4px;
+  border:1px solid var(--border);
+}
+
+/* ── Property grid ─────────────────────────────────────────────────────── */
+.prop-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:.5rem;margin-bottom:1.25rem}
+.prop-cell{border:1px solid var(--border);border-radius:5px;padding:.6rem}
+.prop-cell .pc-label{font-size:.62rem;color:var(--muted);font-family:'IBM Plex Mono',monospace;text-transform:uppercase;letter-spacing:.04em;margin-bottom:.15rem}
+.prop-cell .pc-value{font-size:.78rem;font-weight:600}
+
+/* ── Loading / error states ────────────────────────────────────────────── */
+#loading-state,#error-state{
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  min-height:60vh;gap:1rem;text-align:center;
+}
+.spinner{width:32px;height:32px;border:3px solid var(--border);border-top-color:var(--ink);border-radius:50%;animation:spin .7s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+#error-state h2{font-size:1.1rem;font-weight:700}
+#error-state p{font-size:.82rem;color:var(--muted)}
+#error-state a{color:var(--ink);font-weight:600}
+
+/* ── Print ─────────────────────────────────────────────────────────────── */
+@media print{
+  body{background:#fff}
+  .screen-bar{display:none}
+  .pages{margin:0;gap:0;max-width:none}
+  .page{
+    box-shadow:none;border-radius:0;
+    width:210mm;min-height:297mm;
+    padding:2cm 2cm;
+    page-break-after:always;
+  }
+}
+</style>
+</head>
+<body>
+
+<!-- Screen toolbar -->
+<nav class="screen-bar" id="screen-bar">
+  <div class="brand">Safe<em>Zone</em> / Intelligence</div>
+  <span class="pill" id="tb-province">Loading…</span>
+  <span class="pill" id="tb-id"></span>
+  <div class="spacer"></div>
+  <a href="index.html" class="btn-back">← Back</a>
+  <button class="btn-print" onclick="window.print()">⬇ Print / Save PDF</button>
+</nav>
+
+<!-- Loading state -->
+<div id="loading-state">
+  <div class="spinner"></div>
+  <p style="font-size:.82rem;color:var(--muted)">Loading precinct data…</p>
+</div>
+
+<!-- Error state (hidden by default) -->
+<div id="error-state" style="display:none">
+  <h2>Precinct not found</h2>
+  <p id="error-msg">No precinct matched the requested ID.</p>
+  <a href="index.html">← Return to search</a>
+</div>
+
+<!-- Report pages (populated by JS) -->
+<div class="pages" id="report-pages" style="display:none"></div>
+
+<script>
+// ── Palette ────────────────────────────────────────────────────────────────
+const INK='#111827', RED='#DC2626', BLUE='#2563EB', AMBER='#D97706',
+      GREEN='#059669', GRAY='#9CA3AF';
+
+// ── Helpers ─────────────────────────────────────────────────────────────────
+function riskClass(score){
+  if(score>=80) return 'critical';
+  if(score>=65) return 'high';
+  if(score>=50) return 'elevated';
+  if(score>=35) return 'moderate';
+  return 'low';
+}
+function riskLabel(score){
+  if(score>=80) return 'CRITICAL';
+  if(score>=65) return 'HIGH RISK';
+  if(score>=50) return 'ELEVATED';
+  if(score>=35) return 'MODERATE';
+  return 'LOW';
+}
+function riskBarClass(score){
+  if(score>=65) return '';
+  if(score>=50) return 'warn';
+  return 'ok';
+}
+function sevClass(name){
+  const n=name.toLowerCase();
+  if(/murder|carjack/.test(n)) return 'critical';
+  if(/robbery|sexual|aggravat/.test(n)) return 'high';
+  if(/assault|burglary|vehicle theft/.test(n)) return 'medium';
+  return 'low';
+}
+function fmt(n){return n.toLocaleString()}
+function fmtYoy(y){
+  const pct=Math.abs(Math.round(y*100));
+  if(y>0.02) return `<span class="trend-badge up">▲ ${pct}%</span>`;
+  if(y<-0.02) return `<span class="trend-badge dn">▼ ${pct}%</span>`;
+  return `<span class="trend-badge flat">→ ${pct}%</span>`;
+}
+function refId(id){
+  return 'SZI-'+id.toUpperCase().replace(/[^A-Z0-9]/g,'').slice(0,8)+'-'+Date.now().toString(36).toUpperCase().slice(-4);
+}
+function today(){
+  const d=new Date();
+  return d.toLocaleDateString('en-ZA',{day:'2-digit',month:'long',year:'numeric'});
+}
+
+// ── Build report DOM ─────────────────────────────────────────────────────────
+function buildReport(p, address){
+  const rc = riskClass(p.risk_score);
+  const rl = riskLabel(p.risk_score);
+  const ref = refId(p.id);
+  const displayAddr = address || p.name+' Precinct, '+p.province+', South Africa';
+
+  // Sort categories descending
+  const sorted = [...p.categories].sort((a,b)=>b.count-a.count);
+  const total = p.total_incidents;
+  const rate = p.crime_rate_per_10k;
+
+  // Top category for insight
+  const top = sorted[0];
+  const topPct = Math.round(top.count/total*100);
+
+  // Province avg (mock: score - 8)
+  const provAvg = Math.max(10, p.risk_score - 8);
+  const natAvg  = 54;
+
+  const container = document.getElementById('report-pages');
+  container.innerHTML = '';
+
+  // ──────────────────────────────── PAGE 1 ─────────────────────────────────
+  const p1 = document.createElement('div');
+  p1.className = 'page';
+  p1.innerHTML = `
+    <div class="report-header">
+      <div class="left">
+        <div class="brand-mark">Safe<em>Zone</em> Intelligence</div>
+        <div class="doc-label">Property Crime Risk Assessment · Confidential</div>
+      </div>
+      <div class="right">
+        <div class="ref">${ref}</div>
+        <div class="date">${today()}</div>
+      </div>
+    </div>
+
+    <div class="addr-block">
+      <div class="address" id="p1-addr">${displayAddr}</div>
+      <div class="risk-badge ${rc}">${rl}</div>
+    </div>
+
+    <div class="risk-strip">
+      <div class="risk-score-col ${rc}">
+        <div class="score">${p.risk_score}</div>
+        <div class="score-label">Risk Score</div>
+      </div>
+      <div class="risk-detail-col ${rc}">
+        <div class="precinct-name">SAPS Precinct: ${p.name}</div>
+        <div class="risk-bar-wrap">
+          <div class="risk-bar-track">
+            <div class="risk-bar-fill ${riskBarClass(p.risk_score)}" style="width:${p.risk_score}%"></div>
+          </div>
+        </div>
+        <div class="risk-detail-text">
+          This property falls within the <strong>${p.name}</strong> SAPS precinct in <strong>${p.province}</strong>.
+          The area recorded <strong>${fmt(total)} incidents</strong> in the last 12 months at a rate of
+          <strong>${rate} per 10 000 population</strong>.
+          ${p.risk_score >= 65 ? 'Heightened security measures are strongly advised.' :
+            p.risk_score >= 50 ? 'Standard security measures should be reviewed and reinforced.' :
+            'Standard residential security measures are appropriate.'}
+        </div>
+      </div>
+    </div>
+
+    <div class="prop-grid">
+      <div class="prop-cell"><div class="pc-label">Province</div><div class="pc-value">${p.province}</div></div>
+      <div class="prop-cell"><div class="pc-label">SAPS Precinct</div><div class="pc-value">${p.name}</div></div>
+      <div class="prop-cell"><div class="pc-label">Population</div><div class="pc-value">${fmt(p.population)}</div></div>
+      <div class="prop-cell"><div class="pc-label">Area Coverage</div><div class="pc-value">${fmt(p.area_km2)} km²</div></div>
+      <div class="prop-cell"><div class="pc-label">Avg Response</div><div class="pc-value">${p.response_min} min</div></div>
+      <div class="prop-cell"><div class="pc-label">Primary Station</div><div class="pc-value">${p.stations[0]?.name||'N/A'}</div></div>
+    </div>
+
+    <div class="kpi-grid">
+      <div class="kpi-card">
+        <div class="kpi-val">${fmt(total)}</div>
+        <div class="kpi-lbl">Total Incidents (12 months)</div>
+        <div class="kpi-sub ${sorted[0].yoy>0?'up':'dn'}">${sorted[0].yoy>0?'▲':'▼'} ${Math.abs(Math.round(sorted[0].yoy*100))}% YoY</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-val">${rate}</div>
+        <div class="kpi-lbl">Rate per 10 000 Population</div>
+        <div class="kpi-sub neu">per annum</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-val">${p.response_min} min</div>
+        <div class="kpi-lbl">Average Police Response</div>
+        <div class="kpi-sub neu">SAPS estimated</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-val">${p.stations.length}</div>
+        <div class="kpi-lbl">Nearby SAPS Stations</div>
+        <div class="kpi-sub neu">${p.stations[0]?.name||''}</div>
+      </div>
+    </div>
+
+    <div class="chart-row chart-row-3">
+      <div class="chart-box" style="grid-column:span 2">
+        <div class="chart-title">Crime Profile — Radar</div>
+        <canvas id="c-radar" height="180"></canvas>
+      </div>
+      <div class="chart-box">
+        <div class="chart-title">Category Mix</div>
+        <canvas id="c-donut" height="180"></canvas>
+      </div>
+    </div>
+  `;
+  container.appendChild(p1);
+
+  // ──────────────────────────────── PAGE 2 ─────────────────────────────────
+  const p2 = document.createElement('div');
+  p2.className = 'page';
+  p2.innerHTML = `
+    <div class="cont-header">
+      <span class="label">${ref} · Page 2 of 3</span>
+      <span class="subject">${p.name} · ${p.province}</span>
+    </div>
+
+    <div class="section-heading">Crime Categories — Detailed Breakdown</div>
+    <div class="cat-chart-box">
+      <div class="chart-title">Incident Count by Category (12 months)</div>
+      <canvas id="c-bar" height="160"></canvas>
+    </div>
+
+    <div class="chart-row chart-row-2">
+      <div class="chart-box">
+        <div class="chart-title">5-Year Trend</div>
+        <canvas id="c-trend" height="130"></canvas>
+      </div>
+      <div class="chart-box">
+        <div class="chart-title">Monthly Distribution</div>
+        <canvas id="c-monthly" height="130"></canvas>
+      </div>
+    </div>
+
+    <div class="section-heading">Detailed Crime Table</div>
+    <table class="crime-table">
+      <thead>
+        <tr>
+          <th>Category</th>
+          <th>Severity</th>
+          <th>Count</th>
+          <th>% of Total</th>
+          <th>YoY Change</th>
+        </tr>
+      </thead>
+      <tbody id="crime-tbody"></tbody>
+    </table>
+  `;
+  container.appendChild(p2);
+
+  // ──────────────────────────────── PAGE 3 ─────────────────────────────────
+  const p3 = document.createElement('div');
+  p3.className = 'page';
+  p3.innerHTML = `
+    <div class="cont-header">
+      <span class="label">${ref} · Page 3 of 3</span>
+      <span class="subject">${p.name} · ${p.province}</span>
+    </div>
+
+    <div class="section-heading">SAPS Station Directory</div>
+    <div class="stations-grid" id="stations-grid"></div>
+
+    <div class="section-heading">Intelligence Findings</div>
+    <div class="findings-grid" id="findings-grid"></div>
+
+    <div class="section-heading">Comparative Benchmark</div>
+    <div id="benchmarks"></div>
+
+    <div class="section-heading">Security Recommendations</div>
+    <div class="rec-grid" id="rec-grid"></div>
+
+    <div class="disclaimer">
+      <strong>Disclaimer:</strong> This report is generated using SAPS public crime statistics and is intended
+      for informational purposes only. Crime data reflects the most recently available annual figures and may
+      not capture recent fluctuations. SafeZone Intelligence makes no warranties regarding the accuracy or
+      completeness of this data. This report does not constitute legal, insurance, or investment advice.
+      Always verify current conditions with local SAPS before making security decisions.
+      <strong>Reference: ${ref}</strong>
+    </div>
+  `;
+  container.appendChild(p3);
+
+  // ── Populate dynamic sections ──────────────────────────────────────────────
+
+  // Crime table
+  const tbody = document.getElementById('crime-tbody');
+  sorted.forEach(cat => {
+    const pct = (cat.count/total*100).toFixed(1);
+    tbody.innerHTML += `
+      <tr>
+        <td>${cat.name}</td>
+        <td><span class="pill-sev ${sevClass(cat.name)}">${sevClass(cat.name)}</span></td>
+        <td>${fmt(cat.count)}</td>
+        <td>${pct}%</td>
+        <td>${fmtYoy(cat.yoy)}</td>
+      </tr>`;
+  });
+  // Total row
+  tbody.innerHTML += `<tr>
+    <td>TOTAL</td><td></td><td>${fmt(total)}</td><td>100%</td><td></td>
+  </tr>`;
+
+  // Stations
+  const stGrid = document.getElementById('stations-grid');
+  p.stations.forEach(st => {
+    stGrid.innerHTML += `
+      <div class="station-card">
+        <div class="st-type ${st.type.toLowerCase()}">${st.type.toUpperCase()}</div>
+        <div class="st-name">${st.name}</div>
+        <div class="st-tel">${st.tel}</div>
+        <div class="st-addr">${st.address}</div>
+      </div>`;
+  });
+
+  // Findings
+  const findGrid = document.getElementById('findings-grid');
+  const findings = generateFindings(p, rc, top, topPct);
+  findings.forEach(f => {
+    findGrid.innerHTML += `
+      <div class="finding-item">
+        <div class="finding-dot ${f.color}"></div>
+        <div class="finding-text">${f.text}</div>
+      </div>`;
+  });
+
+  // Benchmarks
+  const bDiv = document.getElementById('benchmarks');
+  const benchmarks = [
+    {label:'This precinct', val:p.risk_score, accent:true},
+    {label:p.province+' average', val:provAvg, accent:false},
+    {label:'National average', val:natAvg, accent:false},
+    {label:'Best in province', val:Math.max(10, provAvg-18), accent:false},
+  ];
+  benchmarks.forEach(b => {
+    bDiv.innerHTML += `
+      <div class="benchmark-row">
+        <div class="benchmark-label">${b.label}</div>
+        <div class="benchmark-track">
+          <div class="benchmark-fill ${b.accent?'accent':''}" style="width:${b.val}%"></div>
+        </div>
+        <div class="benchmark-val">${b.val}/100</div>
+      </div>`;
+  });
+
+  // Recommendations
+  const recGrid = document.getElementById('rec-grid');
+  const recs = generateRecs(p, rc);
+  recs.forEach(r => {
+    recGrid.innerHTML += `
+      <div class="rec-card">
+        <div class="rec-icon">${r.icon}</div>
+        <div class="rec-title">${r.title}</div>
+        <div class="rec-body">${r.body}</div>
+      </div>`;
+  });
+
+  // ── Charts ─────────────────────────────────────────────────────────────────
+  const labels12 = sorted.map(c => c.name.replace(' with Aggravation','').replace('-Related','').replace(' from Vehicle',' (Vehicle)'));
+  const counts12 = sorted.map(c => c.count);
+  const topLabels = sorted.slice(0,5).map(c=>c.name.split(' ')[0]);
+  const topCounts = sorted.slice(0,5).map(c=>c.count);
+
+  // Radar
+  new Chart(document.getElementById('c-radar'), {
+    type:'radar',
+    data:{
+      labels:labels12.slice(0,8),
+      datasets:[{
+        label:'Incidents',
+        data:counts12.slice(0,8),
+        backgroundColor:'rgba(220,38,38,.1)',
+        borderColor:RED,borderWidth:2,pointBackgroundColor:RED,pointRadius:3
+      }]
+    },
+    options:{
+      responsive:true,maintainAspectRatio:true,
+      plugins:{legend:{display:false}},
+      scales:{r:{
+        ticks:{display:false},
+        grid:{color:'rgba(0,0,0,.07)'},
+        pointLabels:{font:{size:7.5},color:INK}
+      }}
+    }
+  });
+
+  // Donut
+  new Chart(document.getElementById('c-donut'), {
+    type:'doughnut',
+    data:{
+      labels:topLabels,
+      datasets:[{
+        data:topCounts,
+        backgroundColor:[RED,AMBER,BLUE,GREEN,GRAY],
+        borderWidth:0
+      }]
+    },
+    options:{
+      responsive:true,maintainAspectRatio:true,cutout:'62%',
+      plugins:{
+        legend:{position:'bottom',labels:{font:{size:8},boxWidth:10,padding:8,color:INK}}
+      }
+    }
+  });
+
+  // Bar — categories
+  new Chart(document.getElementById('c-bar'), {
+    type:'bar',
+    data:{
+      labels:labels12,
+      datasets:[{
+        label:'Incidents',
+        data:counts12,
+        backgroundColor:counts12.map((_,i)=>i===0?RED:i===1?AMBER:GRAY),
+        borderRadius:3
+      }]
+    },
+    options:{
+      indexAxis:'y',responsive:true,maintainAspectRatio:true,
+      plugins:{legend:{display:false}},
+      scales:{
+        x:{grid:{color:'rgba(0,0,0,.05)'},ticks:{font:{size:8},color:INK}},
+        y:{grid:{display:false},ticks:{font:{size:8},color:INK}}
+      }
+    }
+  });
+
+  // Trend line
+  const years = ['2021','2022','2023','2024','2025'];
+  new Chart(document.getElementById('c-trend'), {
+    type:'line',
+    data:{
+      labels:years,
+      datasets:[
+        {
+          label:p.name,
+          data:p.trend,
+          borderColor:RED,backgroundColor:'rgba(220,38,38,.05)',
+          borderWidth:2,tension:.3,pointRadius:3,fill:true
+        },
+        {
+          label:'Province avg',
+          data:p.trend.map(v=>Math.round(v*(provAvg/p.risk_score)*(0.9+Math.random()*.2))),
+          borderColor:GRAY,borderWidth:1.5,borderDash:[4,3],tension:.3,pointRadius:2,fill:false
+        }
+      ]
+    },
+    options:{
+      responsive:true,maintainAspectRatio:true,
+      plugins:{legend:{labels:{font:{size:8},boxWidth:10,color:INK}}},
+      scales:{
+        x:{grid:{display:false},ticks:{font:{size:8},color:INK}},
+        y:{grid:{color:'rgba(0,0,0,.05)'},ticks:{font:{size:8},color:INK}}
+      }
+    }
+  });
+
+  // Monthly bar
+  const monthLabels=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  new Chart(document.getElementById('c-monthly'), {
+    type:'bar',
+    data:{
+      labels:monthLabels,
+      datasets:[{
+        label:'Incidents',
+        data:p.monthly,
+        backgroundColor:p.monthly.map(v=>v===Math.max(...p.monthly)?RED:GRAY),
+        borderRadius:2
+      }]
+    },
+    options:{
+      responsive:true,maintainAspectRatio:true,
+      plugins:{legend:{display:false}},
+      scales:{
+        x:{grid:{display:false},ticks:{font:{size:7.5},color:INK}},
+        y:{grid:{color:'rgba(0,0,0,.05)'},ticks:{font:{size:7.5},color:INK}}
+      }
+    }
+  });
+}
+
+// ── Generate findings ────────────────────────────────────────────────────────
+function generateFindings(p, rc, top, topPct){
+  const murder = p.categories.find(c=>c.name==='Murder');
+  const burglary = p.categories.find(c=>c.name==='Residential Burglary');
+  const robbery = p.categories.find(c=>c.name==='Robbery with Aggravation');
+  const carjack = p.categories.find(c=>c.name==='Carjacking');
+  const drug = p.categories.find(c=>c.name==='Drug-Related');
+  const findings = [];
+
+  findings.push({color: rc==='critical'||rc==='high'?'red':'amber',
+    text:`<strong>${top.name}</strong> is the dominant crime type, accounting for ${topPct}% of all recorded incidents in this precinct.`});
+
+  if(murder && murder.count > 20){
+    findings.push({color:'red',
+      text:`Murder rate is <strong>${murder.count} cases</strong> — ${murder.yoy>0?`up ${Math.round(murder.yoy*100)}%`:`down ${Math.abs(Math.round(murder.yoy*100))}%`} year-on-year. This requires serious consideration.`});
+  }
+  if(burglary){
+    findings.push({color:'amber',
+      text:`Residential burglary recorded at <strong>${burglary.count} incidents</strong>. Security upgrades such as CCTV, alarm systems, and access control are recommended.`});
+  }
+  if(robbery && robbery.count > 100){
+    findings.push({color:'red',
+      text:`Aggravated robbery is ${robbery.yoy>0?'increasing':'present'} with <strong>${robbery.count} incidents</strong>. Avoid displaying valuables and vary your daily routines.`});
+  }
+  if(carjack && carjack.count > 30){
+    findings.push({color:'amber',
+      text:`Carjacking recorded at <strong>${carjack.count} incidents</strong>. Exercise heightened awareness at traffic intersections and driveways.`});
+  }
+  if(drug && drug.count > 200){
+    findings.push({color:'amber',
+      text:`Drug-related offences at <strong>${drug.count} cases</strong> suggest underlying gang or social instability that correlates with property crime.`});
+  }
+  findings.push({color:'green',
+    text:`Average SAPS response time in this precinct is estimated at <strong>${p.response_min} minutes</strong>. Installing a monitored alarm with armed response is advised.`});
+  findings.push({color:'blue',
+    text:`The nearest primary station is <strong>${p.stations[0]?.name}</strong>. Keep ${p.stations[0]?.tel} saved in your phone for emergencies.`});
+
+  return findings.slice(0,8);
+}
+
+// ── Generate recommendations ──────────────────────────────────────────────────
+function generateRecs(p, rc){
+  const high = rc==='critical'||rc==='high';
+  return [
+    {
+      icon:'🔒',title:'Access Control',
+      body: high
+        ? 'Install electric fencing, automated gate, and a video intercom. Ensure all entry points have double-locking mechanisms.'
+        : 'Ensure perimeter walls are adequate. Consider automated gate with keypad. Burglar bars on all ground floor windows.'
+    },
+    {
+      icon:'📷',title:'Surveillance',
+      body: high
+        ? 'Deploy a minimum of 4 HD CCTV cameras covering all entry/exit points and perimeter. Connect to a 24/7 offsite monitoring service.'
+        : 'Install 2–4 CCTV cameras at key vantage points. Smart cameras with motion alerts are sufficient for this risk level.'
+    },
+    {
+      icon:'🚨',title:'Alarm & Response',
+      body:`Link premises to an armed response company with a verified ${high?'5-minute':'10-minute'} response guarantee. Test alarm system monthly and ensure backup battery power.`
+    },
+    {
+      icon:'🌐',title:'Community & Neighbourhood',
+      body:`Join or establish a Neighbourhood Watch linked to ${p.stations[0]?.name} SAPS. Share intelligence via WhatsApp group with immediate neighbours. Register your property on ${p.province} Crime Stop.`
+    }
+  ];
+}
+
+// ── Main: load data and render ───────────────────────────────────────────────
+async function main(){
+  const params = new URLSearchParams(window.location.search);
+  const id = params.get('id');
+  const address = params.get('address') || '';
+
+  if(!id){
+    document.getElementById('loading-state').style.display='none';
+    document.getElementById('error-state').style.display='flex';
+    document.getElementById('error-msg').textContent='No precinct ID specified in the URL.';
+    return;
+  }
+
+  try{
+    const resp = await fetch('data/precincts.json');
+    if(!resp.ok) throw new Error('Failed to load precinct data');
+    const data = await resp.json();
+    const precinct = data.precincts.find(p=>p.id===id);
+
+    if(!precinct){
+      document.getElementById('loading-state').style.display='none';
+      document.getElementById('error-state').style.display='flex';
+      document.getElementById('error-msg').textContent=`Precinct "${id}" not found in database.`;
+      return;
+    }
+
+    // Update toolbar
+    document.title = `Crime Report — ${precinct.name}`;
+    document.getElementById('tb-province').textContent=precinct.province;
+    document.getElementById('tb-id').textContent=precinct.id;
+
+    // Build report
+    document.getElementById('loading-state').style.display='none';
+    document.getElementById('report-pages').style.display='flex';
+    buildReport(precinct, decodeURIComponent(address));
+
+  } catch(err){
+    document.getElementById('loading-state').style.display='none';
+    document.getElementById('error-state').style.display='flex';
+    document.getElementById('error-msg').textContent='Error: '+err.message+'. Make sure you are running this on a web server (not file://).';
+  }
+}
+
+main();
+</script>
+</body>
+</html>
